@@ -4,13 +4,14 @@
 
 #include "poly.h"
 
+#define STARTING_ARRAY 100
+
 void PolyDestroy(Poly *p){
   if(p->arr){
     for(int i = 0; i < p->size; i++){
       MonoDestroy(&((p->arr)[i]));
     }
   }
-  //free(*p); // chyba? nie wiem, nie rozumiem czemu  w MonoDestroy tego nie ma
 }
 
 Poly PolyClone(const Poly *p){
@@ -26,13 +27,45 @@ Poly PolyClone(const Poly *p){
   return clone;
 }
 
-/**
- * Dodaje dwa wielomiany.
- * @param[in] p : wielomian @f$p@f$
- * @param[in] q : wielomian @f$q@f$
- * @return @f$p + q@f$
- */
-Poly PolyAdd(const Poly *p, const Poly *q);
+static inline Poly AddUnproperPolys(const Poly *p, const Poly *q){
+  //assert(!p->arr || !q->arr);
+  if(!p->arr && !q->arr)
+    return PolyFromCoeff(p->coeff + q->coeff);
+  if(!p->arr){
+    Poly temp = (Poly) {.size = 1, .arr = malloc(sizeof(Mono))};
+    (temp.arr)[0] = MonoFromPoly(p->coeff, 0);
+    Poly sum = PolyAdd(q, &temp);
+    PolyDestroy(&temp);
+    return sum;
+  }    
+  //if(!q->arr)
+  return AddUnproperPolys(q, p);
+}
+
+Poly PolyAdd(const Poly *p, const Poly *q){
+  if(!p->arr || !q->arr) return AddUnproperPolys(p, q);
+  Poly sum;
+  sum.arr = malloc((p->size + q->size) * sizeof(struct Mono));
+  size_t ip = 0, iq = 0, isum = 0;
+  while(ip < p->size || iq < q->size){
+    if(ip < p->size && iq < q->size && (p->arr)[ip].exp == (q->arr)[iq].exp){
+      (sum.arr)[isum] = (Mono) {.p = PolyAdd(&((p->arr)[ip].p), &((q->arr)[iq].p)), .exp = (p->arr)[ip].exp};
+      Poly zero = PolyZero();
+      if (!PolyIsEq(&((sum.arr)[isum].p), &zero)) isum++; //jeśli się wyzerowały to nie zapamiętujemy tej pamięci
+      ip++; iq++;
+    }else if(iq == q->size || (ip < p->size && iq < q->size && (p->arr)[ip].exp < (q->arr)[iq].exp)){
+      (sum.arr)[isum] = MonoClone(&((p->arr)[ip]));
+      ip++; isum++;
+    }else{ //ip == p->size || (ip < p->size && iq < q->size && (p->arr)[ip].exp > (q->arr)[iq].exp)
+      (sum.arr)[isum] = MonoClone(&((q->arr)[iq]));
+      iq++; isum++;
+    }
+  }
+  sum.arr = realloc(sum.arr, isum * sizeof(struct Mono));
+  sum.size = isum;
+  return sum;
+}
+
 
 /**
  * Sumuje listę jednomianów i tworzy z nich wielomian.
