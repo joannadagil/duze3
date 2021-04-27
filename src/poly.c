@@ -86,29 +86,70 @@ static inline void MonosSort(Mono monos[], size_t min, size_t max){
     for(size_t i = min; i < max; i++){
       if((monos[i]).exp < (monos[max]).exp){
         MonosSwap(&(monos[mid]), &(monos[i]));
-        i++;
+        mid++;
       }
     }
-    MonosSwap(&(monos[mid + 1]), &(monos[max]));
-    MonosSort(monos, min, mid);
-    MonosSort(monos, mid + 2, max);
+
+    MonosSwap(&(monos[mid]), &(monos[max]));
+    MonosSort(monos, mid + 1, max);
+    if(mid == 0) mid++; //zabezpieczenie przez wejściem na ujemne
+    MonosSort(monos, min, mid - 1);
   }
 }
 
 Poly PolyAddMonos(size_t count, const Mono monos[]){
+  
+  if(count == 0) return PolyZero();
+
+  //posortowanie tablicy
   Mono monos2[count];
   for(size_t i = 0; i < count; i++){
     monos2[i] = MonoClone(&(monos[i]));
   }
-  MonosSort(monos2, 0, count - 1); //tutaj to coś inaczej musi być bo monos jest const
-  Poly sum;
-  size_t imonos = 0, isum = 0;
-  sum.arr = malloc(count * sizeof(Mono));
-  while(imonos < count){
 
+  MonosSort(monos2, 0, count - 1); //tutaj to coś inaczej musi być bo monos jest const
+
+  for(size_t i = 0; i < count; i++){
+      MonoPrint(&(monos2[i]));printf("\n");
   }
-  sum.arr = realloc(sum.arr, isum * sizeof(struct Mono));
-  sum.size = isum;
+
+  //skrocenie tablicy
+  Poly sum;
+  sum.arr = malloc(count * sizeof(Mono));
+  size_t imonos = 1, isum = 0;
+  Mono last = MonoClone(&(monos2[0]));
+  while(imonos < count){
+    if(last.exp == monos2[imonos].exp){
+      Poly temp = PolyAdd(&(last.p), &(monos2[imonos].p));
+      PolyDestroy(&(last.p));
+      last.p = temp;
+    }else{
+      if(!PolyIsZero(&(last.p))){
+        (sum.arr)[isum] = last;
+        isum++;
+      }
+      last = MonoClone(&(monos2[imonos]));
+    }
+    imonos++;
+  }
+  //dopisać resztę z last
+  if(isum > 0){
+    if(!PolyIsZero(&(last.p))){
+      (sum.arr)[isum] = last;
+      isum++;
+    }
+    sum.arr = realloc(sum.arr, isum * sizeof(struct Mono));
+    sum.size = isum;
+  }else{
+    free(sum.arr);
+    sum.arr = NULL;
+    sum.coeff = 0;
+  }
+  //uwolnić tablicę monos2 ?i monos z tablicy monos?
+  for(size_t i = 0; i < count; i++){
+    MonoDestroy(&(monos2[i]));
+    //MonoDestroy(&(monos[i]));
+  }
   return sum;
 }
 
