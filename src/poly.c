@@ -10,6 +10,7 @@ void PolyDestroy(Poly *p){
     for(size_t i = 0; i < p->size; i++){
       MonoDestroy(&((p->arr)[i]));
     }
+    free(p->arr);
   }
 }
 
@@ -28,6 +29,14 @@ Poly PolyClone(const Poly *p){
   return clone;
 }
 
+/**
+ * Zmienia wielomian postaci p na wielomian postaci p(x_1)^0
+ */
+static inline Poly ProperPoly(const Poly *p){
+  Poly proper = (Poly) {.size = 1, .arr = malloc(sizeof(Mono))};
+  (proper.arr)[0] = MonoFromPoly(p, 0);
+  return proper;
+}
 
 /**
  * Dodaje dwa wielomiany, z których conajmniej jeden jest wielomianem prostym.
@@ -40,13 +49,13 @@ static inline Poly AddUnproperPolys(const Poly *p, const Poly *q){
   if(!p->arr && !q->arr)
     return PolyFromCoeff(p->coeff + q->coeff);
   if(!p->arr){
-    Poly temp = (Poly) {.size = 1, .arr = malloc(sizeof(Mono))};
-    (temp.arr)[0] = MonoFromPoly(p, 0);
+    //Poly temp = (Poly) {.size = 1, .arr = malloc(sizeof(Mono))};
+    //(temp.arr)[0] = MonoFromPoly(p, 0);
+    Poly temp = ProperPoly(p);
     Poly sum = PolyAdd(&temp, q);
     PolyDestroy(&temp);
     return sum;
-  }    
-  //if(!q->arr)
+  }//if(!q->arr)
   return AddUnproperPolys(q, p);
 }
 
@@ -153,28 +162,44 @@ Poly PolyAddMonos(size_t count, const Mono monos[]){
   return sum;
 }
 
-/**
- * Mnoży dwa wielomiany.
- * @param[in] p : wielomian @f$p@f$
- * @param[in] q : wielomian @f$q@f$
- * @return @f$p * q@f$
- */
-Poly PolyMul(const Poly *p, const Poly *q);
+Poly MulUnproperPolys(const Poly *p, const Poly *q){
+  if(!p->arr && !q->arr) return PolyFromCoeff(p->coeff * q->coeff);
+  if(!p->arr){
+    Poly temp = ProperPoly(p);
+    Poly mul = PolyMul(&temp, q);
+    PolyDestroy(&temp);
+    return mul;
+  }//if(!q->arr)
+  return MulUnproperPolys(q, p);
+}
 
-/**
- * Zwraca przeciwny wielomian.
- * @param[in] p : wielomian @f$p@f$
- * @return @f$-p@f$
- */
-Poly PolyNeg(const Poly *p);
+Poly PolyMul(const Poly *p, const Poly *q){
+  if(!p->arr || !q->arr) return MulUnproperPolys(p, q);
+  Mono monos[p->size * q->size];
+  size_t imonos = 0;
+  for(size_t ip = 0; ip < p->size; ip++){
+    for(size_t iq = 0; iq < q->size; iq++){
+      monos[imonos] = (Mono) {.p = PolyMul(&((p->arr)[ip].p), &((q->arr)[iq].p)), .exp = (p->arr[ip].exp + q->arr[iq].exp)};
+      imonos++;
+    }
+  }
+  return PolyAddMonos(p->size * q->size, monos);
+}
 
-/**
- * Odejmuje wielomian od wielomianu.
- * @param[in] p : wielomian @f$p@f$
- * @param[in] q : wielomian @f$q@f$
- * @return @f$p - q@f$
- */
-Poly PolySub(const Poly *p, const Poly *q);
+Poly PolyNeg(const Poly *p){
+  Poly *minus = malloc(sizeof(Poly));
+  minus->arr = NULL;
+  minus->coeff = -1;
+  Poly neg = PolyMul(minus, p);
+  free(minus);
+  return neg;
+}
+
+
+Poly PolySub(const Poly *p, const Poly *q){
+  Poly neg = PolyNeg(q);
+  return PolyAdd(p, &neg); //tutaj może poprawić bo nie wiem jak bardzo te wskazniki dzialają
+}
 
 /**
  * Zwraca stopień wielomianu ze względu na zadaną zmienną (-1 dla wielomianu
