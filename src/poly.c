@@ -67,8 +67,13 @@ Poly PolyAdd(const Poly *p, const Poly *q){
   while(ip < p->size || iq < q->size){
     if(ip < p->size && iq < q->size && (p->arr)[ip].exp == (q->arr)[iq].exp){
       (sum.arr)[isum] = (Mono) {.p = PolyAdd(&((p->arr)[ip].p), &((q->arr)[iq].p)), .exp = (p->arr)[ip].exp};
+      
+      if(!PolyIsZero(&((sum.arr)[isum].p))) isum++;
+      /*
       Poly zero = PolyZero();
       if (!PolyIsEq(&((sum.arr)[isum].p), &zero)) isum++; //jeśli się wyzerowały to nie zapamiętujemy tej pamięci
+      */
+
       ip++; iq++;
     }else if(iq == q->size || (ip < p->size && iq < q->size && (p->arr)[ip].exp < (q->arr)[iq].exp)){
       (sum.arr)[isum] = MonoClone(&((p->arr)[ip]));
@@ -193,32 +198,46 @@ Poly PolyNeg(const Poly *p){
   Poly neg = PolyMul(minus, p);
   free(minus);
   return neg;
+  /*
+  Poly minus = (Poly) {.arr = NULL, .coeff = -1};
+  Poly neg = PolyMul(&minus, p);
+  free(minus);
+  return neg;
+  */
 }
-
 
 Poly PolySub(const Poly *p, const Poly *q){
   Poly neg = PolyNeg(q);
   return PolyAdd(p, &neg); //tutaj może poprawić bo nie wiem jak bardzo te wskazniki dzialają
 }
 
-/**
- * Zwraca stopień wielomianu ze względu na zadaną zmienną (-1 dla wielomianu
- * tożsamościowo równego zeru). Zmienne indeksowane są od 0.
- * Zmienna o indeksie 0 oznacza zmienną główną tego wielomianu.
- * Większe indeksy oznaczają zmienne wielomianów znajdujących się
- * we współczynnikach.
- * @param[in] p : wielomian
- * @param[in] var_idx : indeks zmiennej
- * @return stopień wielomianu @p p z względu na zmienną o indeksie @p var_idx
- */
-poly_exp_t PolyDegBy(const Poly *p, size_t var_idx);
+static inline poly_coeff_t max(poly_coeff_t a, poly_coeff_t b){
+  if(a > b) return a;
+  return b;
+}
 
-/**
- * Zwraca stopień wielomianu (-1 dla wielomianu tożsamościowo równego zeru).
- * @param[in] p : wielomian
- * @return stopień wielomianu @p p
- */
-poly_exp_t PolyDeg(const Poly *p);
+poly_exp_t PolyDegBy(const Poly *p, size_t var_idx){
+  if(PolyIsZero(p)) return -1;
+  if(var_idx > 0){
+    poly_coeff_t temp = -1;
+    if(p->arr == NULL) return -1;
+    for(size_t i = 0; i < p->size; i++)
+      temp = max(temp, PolyDegBy(&(p->arr[i].p), var_idx - 1));
+    return temp;
+  }
+  //var_idx == 0
+  if(p->arr == NULL) return 0;
+  return p->arr[p->size - 1].exp; //bo są posortowane rosnąco
+}
+
+poly_exp_t PolyDeg(const Poly *p){
+  if(PolyIsZero(p)) return -1;
+  if(p->arr == NULL) return 0;
+  poly_coeff_t deg = 0;
+  for(int i = 0; i < p->size; i++)
+    deg = max(deg, p->arr[i].exp + PolyDeg(&(p->arr[i].p)));
+  return deg;
+}
 
 /**
  * Sprawdza równość dwóch jednomianów.
@@ -242,15 +261,26 @@ bool PolyIsEq(const Poly *p, const Poly *q){
   return false;
 }
 
-/**
- * Wylicza wartość wielomianu w punkcie @p x.
- * Wstawia pod pierwszą zmienną wielomianu wartość @p x.
- * W wyniku może powstać wielomian, jeśli współczynniki są wielomianami.
- * Wtedy zmniejszane są o jeden indeksy zmiennych w takim wielomianie.
- * Formalnie dla wielomianu @f$p(x_0, x_1, x_2, \ldots)@f$ wynikiem jest
- * wielomian @f$p(x, x_0, x_1, \ldots)@f$.
- * @param[in] p : wielomian @f$p@f$
- * @param[in] x : wartość argumentu @f$x@f$
- * @return @f$p(x, x_0, x_1, \ldots)@f$
- */
-Poly PolyAt(const Poly *p, poly_coeff_t x);
+static inline poly_coeff_t pow(poly_coeff_t x, poly_exp_t exp){
+  if(exp == 0) return 1;
+  if(exp == 1) return x;
+  poly_coeff_t res = pow(x, exp / 2);
+  if(exp % 2 == 1)
+    return res * res * x;
+  return res * res;
+}
+
+Poly PolyAt(const Poly *p, poly_coeff_t x){
+  if(p->arr == NULL) return PolyClone(p);
+  Poly res = PolyZero();
+  for(size_t i = 0; i < p->size; i++){
+    Poly temp0 = PolyFromCoeff(pow(x, p->arr[i].exp));
+    Poly temp1 = PolyMul(&(p->arr[i].p), &temp0);
+    Poly temp2 = PolyAdd(&res, &temp1);
+    PolyDestroy(&res);
+    PolyDestroy(&temp0);
+    PolyDestroy(&temp1);
+    res = temp2;
+  }
+  return res;
+}
