@@ -203,7 +203,7 @@ Poly PolyMul(const Poly *p, const Poly *q){
     }
   }
   Poly mul = PolyAddMonos(p->size * q->size, monos);
-  free(monos);
+  //free(monos);
   return mul;
 }
 
