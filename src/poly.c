@@ -33,7 +33,7 @@ static inline Poly UnproperPoly(Poly *p){
     if(p->arr && p->size == 1 && !p->arr[0].p.arr){
         if(p->arr[0].exp == 0){
             Poly temp = p->arr[0].p;
-            //PolyDestroy(p);
+            PolyDestroy(p);
             return temp;
         }
     }
@@ -175,7 +175,6 @@ Poly PolyAddMonos(size_t count, const Mono monos[]){
         MonoDestroy(&(monos[i].p.arr[j]));
       }
       free(monos[i].p.arr);
-
     }
   }
   sum = UnproperPoly(&sum);
