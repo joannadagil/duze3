@@ -54,17 +54,15 @@ Poly ProperPoly(const Poly *p){
 }
 
 Poly AddUnproperPolys(const Poly *p, const Poly *q){
-  //assert(!p->arr || !q->arr);
+  assert(!p->arr || !q->arr);
   if(!p->arr && !q->arr)
     return PolyFromCoeff(p->coeff + q->coeff);
   if(!p->arr){
-    //Poly temp = (Poly) {.size = 1, .arr = malloc(sizeof(Mono))};
-    //(temp.arr)[0] = MonoFromPoly(p, 0);
     Poly temp = ProperPoly(p);
     Poly sum = PolyAdd(&temp, q);
     PolyDestroy(&temp);
     return sum;
-  }//if(!q->arr)
+  }
   return AddUnproperPolys(q, p);
 }
 
@@ -120,17 +118,28 @@ void MonosSort(Mono monos[], size_t min, size_t max){
   }
 }
 
+Mono *MonoSorted(size_t count, const Mono monos[]){
+  Mono monos2[count];
+  for(size_t i = 0; i < count; i++){
+    monos2[i] = MonoClone(&(monos[i]));
+  }
+  MonosSort(monos2, 0, count - 1);
+  return monos2;
+}
+
 Poly PolyAddMonos(size_t count, const Mono monos[]){
   
   if(count == 0) return PolyZero();
 
   //posortowanie tablicy
-  Mono monos2[count];
+  /*Mono monos2[count];
   for(size_t i = 0; i < count; i++){
     monos2[i] = MonoClone(&(monos[i]));
   }
-
   MonosSort(monos2, 0, count - 1); //tutaj to coś inaczej musi być bo monos jest const
+  */
+
+  Mono monos2[] = MonoSorted(count, monos);
 
   //skrocenie tablicy
   Poly sum;
