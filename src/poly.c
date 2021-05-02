@@ -202,7 +202,9 @@ Poly PolyMul(const Poly *p, const Poly *q){
       imonos++;
     }
   }
-  return PolyAddMonos(p->size * q->size, monos);
+  Poly mul = PolyAddMonos(p->size * q->size, monos);
+  free(monos);
+  return mul;
 }
 
 Poly PolyNeg(const Poly *p){
@@ -213,6 +215,7 @@ Poly PolyNeg(const Poly *p){
   free(minus);*/
   Poly minus = (Poly) {.arr = NULL, .coeff = -1};
   Poly neg = PolyMul(&minus, p);
+  PolyDestroy(&minus);
   return neg;
 }
 
