@@ -221,7 +221,9 @@ Poly PolyNeg(const Poly *p){
 
 Poly PolySub(const Poly *p, const Poly *q){
   Poly neg = PolyNeg(q);
-  return PolyAdd(p, &neg); //tutaj może poprawić bo nie wiem jak bardzo te wskazniki dzialają
+  Poly sub = PolyAdd(p, &neg);
+  PolyDestroy(&neg);
+  return sub; //tutaj może poprawić bo nie wiem jak bardzo te wskazniki dzialają
 }
 
 static inline poly_coeff_t max(poly_coeff_t a, poly_coeff_t b){
