@@ -12,6 +12,13 @@
 
 #include "poly.h"
 
+static inline Mono* SafeMalloc(size_t size){
+  Mono *ptr;
+  ptr = malloc(size * sizeof(Mono));
+  if(ptr == NULL) exit(1);
+  return ptr;
+}
+
 void PolyDestroy(Poly *p){
   if(p->arr){
     for(size_t i = 0; i < p->size; i++){
@@ -25,7 +32,7 @@ Poly PolyClone(const Poly *p){
   Poly clone;
   if(p->arr){
     clone.size = p->size;
-    clone.arr = malloc(p->size * sizeof(struct Mono));
+    clone.arr = SafeMalloc(p->size);
     for(size_t i = 0; i < p->size; i++){
       (clone.arr)[i] = MonoClone(&((p->arr)[i]));
     }
@@ -48,7 +55,7 @@ Poly UnproperPoly(Poly *p){
 }
 
 Poly ProperPoly(const Poly *p){
-  Poly proper = (Poly) {.size = 1, .arr = malloc(sizeof(Mono))};
+  Poly proper = (Poly) {.size = 1, .arr = SafeMalloc(1)};
   (proper.arr)[0] = MonoFromPoly(p, 0);
   return proper;
 }
@@ -69,7 +76,7 @@ Poly AddUnproperPolys(const Poly *p, const Poly *q){
 Poly PolyAdd(const Poly *p, const Poly *q){
   if(!p->arr || !q->arr) return AddUnproperPolys(p, q);
   Poly sum;
-  sum.arr = malloc((p->size + q->size) * sizeof(struct Mono));
+  sum.arr = SafeMalloc(p->size + q->size);
   size_t ip = 0, iq = 0, isum = 0;
   while(ip < p->size || iq < q->size){
     if(ip < p->size && iq < q->size && (p->arr)[ip].exp == (q->arr)[iq].exp){
@@ -153,7 +160,7 @@ Poly PolyAddMonos(size_t count, const Mono monos[]){
     monos2[i] = MonoClone(&(monos[i]));
   MonosSort(monos2, 0, count - 1);
   Poly sum;
-  sum.arr = malloc(count * sizeof(Mono));
+  sum.arr = SafeMalloc(count);
   size_t imonos = 1, isum = 0;
   Mono last = MonoClone(&(monos2[0]));
   while(imonos < count){
