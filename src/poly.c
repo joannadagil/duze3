@@ -118,7 +118,23 @@ void MonosSort(Mono monos[], size_t min, size_t max){
   }
 }
 
-void freeing(size_t count, Mono monos2[], Mono monos[]){
+Poly AddLast(size_t isum, size_t count, Mono last, Poly *sum){
+  if(isum > 0 || count == 1 || !PolyIsZero(&(last.p))){
+    if(!PolyIsZero(&(last.p))){
+      (sum->arr)[isum] = last;
+      isum++;
+    }
+    sum->arr = realloc(sum->arr, isum * sizeof(struct Mono));
+    sum->size = isum;
+  }else{
+    free(sum->arr);
+    sum->arr = NULL;
+    sum->coeff = 0;
+  }
+  return *sum;
+}
+
+void freeing(size_t count, Mono monos2[], const Mono monos[]){
   for(size_t i = 0; i < count; i++){
     MonoDestroy(&(monos2[i]));
     if(monos[i].p.arr){
@@ -131,12 +147,11 @@ void freeing(size_t count, Mono monos2[], Mono monos[]){
 }
 
 Poly PolyAddMonos(size_t count, const Mono monos[]){
-  
   if(count == 0) return PolyZero();
   Mono monos2[count];
   for(size_t i = 0; i < count; i++)
     monos2[i] = MonoClone(&(monos[i]));
-  MonosSort(monos2, 0, count - 1); //tutaj to coś inaczej musi być bo monos jest const
+  MonosSort(monos2, 0, count - 1);
   Poly sum;
   sum.arr = malloc(count * sizeof(Mono));
   size_t imonos = 1, isum = 0;
@@ -155,19 +170,7 @@ Poly PolyAddMonos(size_t count, const Mono monos[]){
     }
     imonos++;
   }
-  //dopisać resztę z last
-  if(isum > 0 || count == 1 || !PolyIsZero(&(last.p))){
-    if(!PolyIsZero(&(last.p))){
-      (sum.arr)[isum] = last;
-      isum++;
-    }
-    sum.arr = realloc(sum.arr, isum * sizeof(struct Mono));
-    sum.size = isum;
-  }else{
-    free(sum.arr);
-    sum.arr = NULL;
-    sum.coeff = 0;
-  }
+  sum = AddLast(isum, count, last, &sum);
   freeing(count, monos2, monos);
   sum = UnproperPoly(&sum);
   return sum;
