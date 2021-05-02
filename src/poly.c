@@ -170,7 +170,13 @@ Poly PolyAddMonos(size_t count, const Mono monos[]){
   //uwolnić tablicę monos2 ?i monos z tablicy monos?
   for(size_t i = 0; i < count; i++){
     MonoDestroy(&(monos2[i]));
-    PolyDestroy(&(monos[i].p));
+    if(monos[i].p.arr){
+      for(size_t j = 0; j < monos[i].p.size; j++){
+        MonoDestroy(&(monos[i].p.arr[j]));
+      }
+      free(monos[i].p.arr);
+
+    }
   }
   sum = UnproperPoly(&sum);
   return sum;
