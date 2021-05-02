@@ -29,6 +29,17 @@ Poly PolyClone(const Poly *p){
   return clone;
 }
 
+static inline Poly UnproperPoly(Poly *p){
+    if(p->arr && p->size == 1 && !p->arr[0].p.arr){
+        if(p->arr[0].exp == 0){
+            Poly temp = p->arr[0].p;
+            //PolyDestroy(p);
+            return temp;
+        }
+    }
+    return *p;
+}
+
 /**
  * Zmienia wielomian postaci p na wielomian postaci p(x_1)^0
  */
@@ -67,24 +78,25 @@ Poly PolyAdd(const Poly *p, const Poly *q){
   while(ip < p->size || iq < q->size){
     if(ip < p->size && iq < q->size && (p->arr)[ip].exp == (q->arr)[iq].exp){
       (sum.arr)[isum] = (Mono) {.p = PolyAdd(&((p->arr)[ip].p), &((q->arr)[iq].p)), .exp = (p->arr)[ip].exp};
-      
       if(!PolyIsZero(&((sum.arr)[isum].p))) isum++;
-      /*
-      Poly zero = PolyZero();
-      if (!PolyIsEq(&((sum.arr)[isum].p), &zero)) isum++; //jeśli się wyzerowały to nie zapamiętujemy tej pamięci
-      */
-
       ip++; iq++;
     }else if(iq == q->size || (ip < p->size && iq < q->size && (p->arr)[ip].exp < (q->arr)[iq].exp)){
-      (sum.arr)[isum] = MonoClone(&((p->arr)[ip]));
-      ip++; isum++;
+      if(!PolyIsZero(&((p->arr)[ip].p))){
+        (sum.arr)[isum] = MonoClone(&((p->arr)[ip]));
+        isum++;
+      }
+      ip++;
     }else{ //ip == p->size || (ip < p->size && iq < q->size && (p->arr)[ip].exp > (q->arr)[iq].exp)
-      (sum.arr)[isum] = MonoClone(&((q->arr)[iq]));
-      iq++; isum++;
+      if(!PolyIsZero(&((q->arr)[iq].p))){
+        (sum.arr)[isum] = MonoClone(&((q->arr)[iq]));
+        isum++;
+      }
+      iq++;
     }
   }
   sum.arr = realloc(sum.arr, isum * sizeof(struct Mono));
   sum.size = isum; //o dziwo działa też dla zerujących się wielomianów
+  sum = UnproperPoly(&sum);
   return sum;
 }
 
@@ -123,10 +135,6 @@ Poly PolyAddMonos(size_t count, const Mono monos[]){
 
   MonosSort(monos2, 0, count - 1); //tutaj to coś inaczej musi być bo monos jest const
 
-  for(size_t i = 0; i < count; i++){
-      MonoPrint(&(monos2[i]));printf("\n");
-  }
-
   //skrocenie tablicy
   Poly sum;
   sum.arr = malloc(count * sizeof(Mono));
@@ -147,7 +155,7 @@ Poly PolyAddMonos(size_t count, const Mono monos[]){
     imonos++;
   }
   //dopisać resztę z last
-  if(isum > 0){
+  if(isum > 0 || count == 1 || !PolyIsZero(&(last.p))){
     if(!PolyIsZero(&(last.p))){
       (sum.arr)[isum] = last;
       isum++;
@@ -164,6 +172,7 @@ Poly PolyAddMonos(size_t count, const Mono monos[]){
     MonoDestroy(&(monos2[i]));
     //MonoDestroy(&(monos[i]));
   }
+  sum = UnproperPoly(&sum);
   return sum;
 }
 
@@ -234,7 +243,7 @@ poly_exp_t PolyDeg(const Poly *p){
   if(PolyIsZero(p)) return -1;
   if(p->arr == NULL) return 0;
   poly_coeff_t deg = 0;
-  for(int i = 0; i < p->size; i++)
+  for(size_t i = 0; i < p->size; i++)
     deg = max(deg, p->arr[i].exp + PolyDeg(&(p->arr[i].p)));
   return deg;
 }
@@ -261,10 +270,10 @@ bool PolyIsEq(const Poly *p, const Poly *q){
   return false;
 }
 
-static inline poly_coeff_t pow(poly_coeff_t x, poly_exp_t exp){
+static inline poly_coeff_t pow2(poly_coeff_t x, poly_exp_t exp){
   if(exp == 0) return 1;
   if(exp == 1) return x;
-  poly_coeff_t res = pow(x, exp / 2);
+  poly_coeff_t res = pow2(x, exp / 2);
   if(exp % 2 == 1)
     return res * res * x;
   return res * res;
@@ -274,7 +283,7 @@ Poly PolyAt(const Poly *p, poly_coeff_t x){
   if(p->arr == NULL) return PolyClone(p);
   Poly res = PolyZero();
   for(size_t i = 0; i < p->size; i++){
-    Poly temp0 = PolyFromCoeff(pow(x, p->arr[i].exp));
+    Poly temp0 = PolyFromCoeff(pow2(x, p->arr[i].exp));
     Poly temp1 = PolyMul(&(p->arr[i].p), &temp0);
     Poly temp2 = PolyAdd(&res, &temp1);
     PolyDestroy(&res);
