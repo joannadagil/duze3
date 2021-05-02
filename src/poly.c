@@ -36,7 +36,7 @@ Poly PolyClone(const Poly *p){
   return clone;
 }
 
-static inline Poly UnproperPoly(Poly *p){
+Poly UnproperPoly(Poly *p){
   if(p->arr && p->size == 1 && !p->arr[0].p.arr){
     if(p->arr[0].exp == 0){
       Poly temp = p->arr[0].p;
@@ -47,13 +47,13 @@ static inline Poly UnproperPoly(Poly *p){
   return *p;
 }
 
-static inline Poly ProperPoly(const Poly *p){
+Poly ProperPoly(const Poly *p){
   Poly proper = (Poly) {.size = 1, .arr = malloc(sizeof(Mono))};
   (proper.arr)[0] = MonoFromPoly(p, 0);
   return proper;
 }
 
-static inline Poly AddUnproperPolys(const Poly *p, const Poly *q){
+Poly AddUnproperPolys(const Poly *p, const Poly *q){
   //assert(!p->arr || !q->arr);
   if(!p->arr && !q->arr)
     return PolyFromCoeff(p->coeff + q->coeff);
@@ -104,7 +104,7 @@ static inline void MonosSwap(Mono *a, Mono *b){
   *b = temp;
 }
 
-static inline void MonosSort(Mono monos[], size_t min, size_t max){
+void MonosSort(Mono monos[], size_t min, size_t max){
   if(min < max){
     size_t mid = min;
     for(size_t i = min; i < max; i++){
@@ -261,7 +261,7 @@ bool PolyIsEq(const Poly *p, const Poly *q){
   return false;
 }
 
-static inline poly_coeff_t pow2(poly_coeff_t x, poly_exp_t exp){
+poly_coeff_t pow2(poly_coeff_t x, poly_exp_t exp){
   if(exp == 0) return 1;
   if(exp == 1) return x;
   poly_coeff_t res = pow2(x, exp / 2);

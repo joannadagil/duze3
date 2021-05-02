@@ -145,14 +145,14 @@ static inline Mono MonoClone(const Mono *m) {
  * @param[in] p : wielomian 
  * @return skrócony wielomian
  */
-static inline Poly UnproperPoly(Poly *p);
+Poly UnproperPoly(Poly *p);
 
 /**
  * Zmienia wielomian postaci p na wielomian postaci p(x_0)^0
  * @param[in] p : wielomian @f$q@f$
  * @return @f$p * x^0@f$
  */
-static inline Poly ProperPoly(const Poly *p);
+Poly ProperPoly(const Poly *p);
 
 /**
  * Dodaje dwa wielomiany, z których conajmniej jeden jest wielomianem prostym.
@@ -160,7 +160,7 @@ static inline Poly ProperPoly(const Poly *p);
  * @param[in] q : wielomian @f$q@f$
  * @return @f$p + q@f$
  */
-static inline Poly AddUnproperPolys(const Poly *p, const Poly *q);
+Poly AddUnproperPolys(const Poly *p, const Poly *q);
 
 /**
  * Dodaje dwa wielomiany.
@@ -176,7 +176,7 @@ Poly PolyAdd(const Poly *p, const Poly *q);
  * @param[in] min : indeks, od którego sortujemy 
  * @param[in] max : indeks, do którego sortujemy 
  */
-static inline void MonosSort(Mono monos[], size_t min, size_t max);
+void MonosSort(Mono monos[], size_t min, size_t max);
 
 /**
  * Sumuje listę jednomianów i tworzy z nich wielomian.
@@ -259,7 +259,7 @@ bool PolyIsEq(const Poly *p, const Poly *q);
  * @param[in] exp : wykładnik @f$q@f$
  * @return @f$x^exp@f$
  */
-static inline poly_coeff_t pow2(poly_coeff_t x, poly_exp_t exp);
+poly_coeff_t pow2(poly_coeff_t x, poly_exp_t exp);
 
 /**
  * Wylicza wartość wielomianu w punkcie @p x.
