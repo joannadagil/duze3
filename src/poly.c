@@ -183,7 +183,7 @@ Poly MulUnproperPolys(const Poly *p, const Poly *q){
     Poly mul = PolyMul(&temp, q);
     PolyDestroy(&temp);
     return mul;
-  }//if(!q->arr)
+  }
   assert(!q->arr);
   return MulUnproperPolys(q, p);
 }
