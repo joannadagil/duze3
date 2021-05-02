@@ -36,11 +36,6 @@ Poly PolyClone(const Poly *p){
   return clone;
 }
 
-/**
- * Zamienia wielomian postaci p(x_0)^0 na wielomian postaci p, jeśli będzie równoważny 
- * @param[in] p : wielomian 
- * @return skrócony wielomian
- */
 static inline Poly UnproperPoly(Poly *p){
   if(p->arr && p->size == 1 && !p->arr[0].p.arr){
     if(p->arr[0].exp == 0){
@@ -52,23 +47,12 @@ static inline Poly UnproperPoly(Poly *p){
   return *p;
 }
 
-/**
- * Zmienia wielomian postaci p na wielomian postaci p(x_0)^0
- * @param[in] p : wielomian @f$q@f$
- * @return @f$p * x^0@f$
- */
 static inline Poly ProperPoly(const Poly *p){
   Poly proper = (Poly) {.size = 1, .arr = malloc(sizeof(Mono))};
   (proper.arr)[0] = MonoFromPoly(p, 0);
   return proper;
 }
 
-/**
- * Dodaje dwa wielomiany, z których conajmniej jeden jest wielomianem prostym.
- * @param[in] p : wielomian @f$p@f$
- * @param[in] q : wielomian @f$q@f$
- * @return @f$p + q@f$
- */
 static inline Poly AddUnproperPolys(const Poly *p, const Poly *q){
   //assert(!p->arr || !q->arr);
   if(!p->arr && !q->arr)
@@ -120,12 +104,6 @@ static inline void MonosSwap(Mono *a, Mono *b){
   *b = temp;
 }
 
-/**
- * Sortuje tablicę jednomianów.
- * @param[in] monos : tablica jednomianów
- * @param[in] min : indeks, od którego sortujemy 
- * @param[in] max : indeks, do którego sortujemy 
- */
 static inline void MonosSort(Mono monos[], size_t min, size_t max){
   if(min < max){
     size_t mid = min;
@@ -200,12 +178,6 @@ Poly PolyAddMonos(size_t count, const Mono monos[]){
   return sum;
 }
 
-/**
- * Mnoży dwa wielomiany, z których conajmniej jeden jest wielomianem prostym.
- * @param[in] p : wielomian @f$p@f$
- * @param[in] q : wielomian @f$q@f$
- * @return @f$p * q@f$
- */
 Poly MulUnproperPolys(const Poly *p, const Poly *q){
   if(!p->arr && !q->arr) return PolyFromCoeff(p->coeff * q->coeff);
   if(!p->arr){
@@ -229,7 +201,6 @@ Poly PolyMul(const Poly *p, const Poly *q){
     }
   }
   Poly mul = PolyAddMonos(p->size * q->size, monos);
-  //free(monos);
   return mul;
 }
 
@@ -274,12 +245,6 @@ poly_exp_t PolyDeg(const Poly *p){
   return deg;
 }
 
-/**
- * Sprawdza równość dwóch jednomianów.
- * @param[in] m : jednomian @f$m@f$
- * @param[in] n : jednomian @f$n@f$
- * @return @f$m = n@f$
- */
 bool MonoIsEq(const Mono *m, const Mono *n){
   return (m->exp == n->exp && PolyIsEq(&(m->p), &(n->p)));
 }
@@ -296,12 +261,6 @@ bool PolyIsEq(const Poly *p, const Poly *q){
   return false;
 }
 
-/**
- * Podnosi @p x do potęgi @p exp.
- * @param[in] x : baza @f$p@f$
- * @param[in] exp : wykładnik @f$q@f$
- * @return @f$x^exp@f$
- */
 static inline poly_coeff_t pow2(poly_coeff_t x, poly_exp_t exp){
   if(exp == 0) return 1;
   if(exp == 1) return x;

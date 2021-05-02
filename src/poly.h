@@ -141,12 +141,42 @@ static inline Mono MonoClone(const Mono *m) {
 }
 
 /**
+ * Zamienia wielomian postaci p(x_0)^0 na wielomian postaci p, jeśli będzie równoważny 
+ * @param[in] p : wielomian 
+ * @return skrócony wielomian
+ */
+static inline Poly UnproperPoly(Poly *p);
+
+/**
+ * Zmienia wielomian postaci p na wielomian postaci p(x_0)^0
+ * @param[in] p : wielomian @f$q@f$
+ * @return @f$p * x^0@f$
+ */
+static inline Poly ProperPoly(const Poly *p);
+
+/**
+ * Dodaje dwa wielomiany, z których conajmniej jeden jest wielomianem prostym.
+ * @param[in] p : wielomian @f$p@f$
+ * @param[in] q : wielomian @f$q@f$
+ * @return @f$p + q@f$
+ */
+static inline Poly AddUnproperPolys(const Poly *p, const Poly *q);
+
+/**
  * Dodaje dwa wielomiany.
  * @param[in] p : wielomian @f$p@f$
  * @param[in] q : wielomian @f$q@f$
  * @return @f$p + q@f$
  */
 Poly PolyAdd(const Poly *p, const Poly *q);
+
+/**
+ * Sortuje tablicę jednomianów.
+ * @param[in] monos : tablica jednomianów
+ * @param[in] min : indeks, od którego sortujemy 
+ * @param[in] max : indeks, do którego sortujemy 
+ */
+static inline void MonosSort(Mono monos[], size_t min, size_t max);
 
 /**
  * Sumuje listę jednomianów i tworzy z nich wielomian.
@@ -156,6 +186,14 @@ Poly PolyAdd(const Poly *p, const Poly *q);
  * @return wielomian będący sumą jednomianów
  */
 Poly PolyAddMonos(size_t count, const Mono monos[]);
+
+/**
+ * Mnoży dwa wielomiany, z których conajmniej jeden jest wielomianem prostym.
+ * @param[in] p : wielomian @f$p@f$
+ * @param[in] q : wielomian @f$q@f$
+ * @return @f$p * q@f$
+ */
+Poly MulUnproperPolys(const Poly *p, const Poly *q);
 
 /**
  * Mnoży dwa wielomiany.
@@ -200,12 +238,28 @@ poly_exp_t PolyDegBy(const Poly *p, size_t var_idx);
 poly_exp_t PolyDeg(const Poly *p);
 
 /**
+ * Sprawdza równość dwóch jednomianów.
+ * @param[in] m : jednomian @f$m@f$
+ * @param[in] n : jednomian @f$n@f$
+ * @return @f$m = n@f$
+ */
+bool MonoIsEq(const Mono *m, const Mono *n);
+
+/**
  * Sprawdza równość dwóch wielomianów.
  * @param[in] p : wielomian @f$p@f$
  * @param[in] q : wielomian @f$q@f$
  * @return @f$p = q@f$
  */
 bool PolyIsEq(const Poly *p, const Poly *q);
+
+/**
+ * Podnosi @p x do potęgi @p exp.
+ * @param[in] x : baza @f$p@f$
+ * @param[in] exp : wykładnik @f$q@f$
+ * @return @f$x^exp@f$
+ */
+static inline poly_coeff_t pow2(poly_coeff_t x, poly_exp_t exp);
 
 /**
  * Wylicza wartość wielomianu w punkcie @p x.
