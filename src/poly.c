@@ -118,30 +118,25 @@ void MonosSort(Mono monos[], size_t min, size_t max){
   }
 }
 
-Mono *MonoSorted(size_t count, const Mono monos[]){
-  Mono monos2[count];
+void freeing(size_t count, Mono monos2[], Mono monos[]){
   for(size_t i = 0; i < count; i++){
-    monos2[i] = MonoClone(&(monos[i]));
+    MonoDestroy(&(monos2[i]));
+    if(monos[i].p.arr){
+      for(size_t j = 0; j < monos[i].p.size; j++){
+        MonoDestroy(&(monos[i].p.arr[j]));
+      }
+      free(monos[i].p.arr);
+    }
   }
-  MonosSort(monos2, 0, count - 1);
-  return monos2;
 }
 
 Poly PolyAddMonos(size_t count, const Mono monos[]){
   
   if(count == 0) return PolyZero();
-
-  //posortowanie tablicy
-  /*Mono monos2[count];
-  for(size_t i = 0; i < count; i++){
+  Mono monos2[count];
+  for(size_t i = 0; i < count; i++)
     monos2[i] = MonoClone(&(monos[i]));
-  }
   MonosSort(monos2, 0, count - 1); //tutaj to coś inaczej musi być bo monos jest const
-  */
-
-  Mono monos2[] = MonoSorted(count, monos);
-
-  //skrocenie tablicy
   Poly sum;
   sum.arr = malloc(count * sizeof(Mono));
   size_t imonos = 1, isum = 0;
@@ -173,16 +168,7 @@ Poly PolyAddMonos(size_t count, const Mono monos[]){
     sum.arr = NULL;
     sum.coeff = 0;
   }
-  //uwolnić tablicę monos2 ?i monos z tablicy monos?
-  for(size_t i = 0; i < count; i++){
-    MonoDestroy(&(monos2[i]));
-    if(monos[i].p.arr){
-      for(size_t j = 0; j < monos[i].p.size; j++){
-        MonoDestroy(&(monos[i].p.arr[j]));
-      }
-      free(monos[i].p.arr);
-    }
-  }
+  freeing(count, monos2, monos);
   sum = UnproperPoly(&sum);
   return sum;
 }
