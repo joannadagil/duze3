@@ -1,3 +1,10 @@
+/** @file
+  Klasa wielomianów rzadkich wielu zmiennych
+
+  @authors Joanna Dagil <jd417531@students.mimuw.edu.pl>
+  @date 2021
+*/
+
 #include <assert.h>
 #include <stdbool.h>
 #include <stddef.h>
@@ -29,19 +36,26 @@ Poly PolyClone(const Poly *p){
   return clone;
 }
 
+/**
+ * Zamienia wielomian postaci p(x_0)^0 na wielomian postaci p, jeśli będzie równoważny 
+ * @param[in] p : wielomian 
+ * @return skrócony wielomian
+ */
 static inline Poly UnproperPoly(Poly *p){
-    if(p->arr && p->size == 1 && !p->arr[0].p.arr){
-        if(p->arr[0].exp == 0){
-            Poly temp = p->arr[0].p;
-            PolyDestroy(p);
-            return temp;
-        }
+  if(p->arr && p->size == 1 && !p->arr[0].p.arr){
+    if(p->arr[0].exp == 0){
+      Poly temp = p->arr[0].p;
+      PolyDestroy(p);
+      return temp;
     }
-    return *p;
+  }
+  return *p;
 }
 
 /**
- * Zmienia wielomian postaci p na wielomian postaci p(x_1)^0
+ * Zmienia wielomian postaci p na wielomian postaci p(x_0)^0
+ * @param[in] p : wielomian @f$q@f$
+ * @return @f$p * x^0@f$
  */
 static inline Poly ProperPoly(const Poly *p){
   Poly proper = (Poly) {.size = 1, .arr = malloc(sizeof(Mono))};
@@ -95,7 +109,7 @@ Poly PolyAdd(const Poly *p, const Poly *q){
     }
   }
   sum.arr = realloc(sum.arr, isum * sizeof(struct Mono));
-  sum.size = isum; //o dziwo działa też dla zerujących się wielomianów
+  sum.size = isum;
   sum = UnproperPoly(&sum);
   return sum;
 }
@@ -106,6 +120,12 @@ static inline void MonosSwap(Mono *a, Mono *b){
   *b = temp;
 }
 
+/**
+ * Sortuje tablicę jednomianów.
+ * @param[in] monos : tablica jednomianów
+ * @param[in] min : indeks, od którego sortujemy 
+ * @param[in] max : indeks, do którego sortujemy 
+ */
 static inline void MonosSort(Mono monos[], size_t min, size_t max){
   if(min < max){
     size_t mid = min;
@@ -115,7 +135,6 @@ static inline void MonosSort(Mono monos[], size_t min, size_t max){
         mid++;
       }
     }
-
     MonosSwap(&(monos[mid]), &(monos[max]));
     MonosSort(monos, mid + 1, max);
     if(mid == 0) mid++; //zabezpieczenie przez wejściem na ujemne
@@ -181,6 +200,12 @@ Poly PolyAddMonos(size_t count, const Mono monos[]){
   return sum;
 }
 
+/**
+ * Mnoży dwa wielomiany, z których conajmniej jeden jest wielomianem prostym.
+ * @param[in] p : wielomian @f$p@f$
+ * @param[in] q : wielomian @f$q@f$
+ * @return @f$p * q@f$
+ */
 Poly MulUnproperPolys(const Poly *p, const Poly *q){
   if(!p->arr && !q->arr) return PolyFromCoeff(p->coeff * q->coeff);
   if(!p->arr){
@@ -189,6 +214,7 @@ Poly MulUnproperPolys(const Poly *p, const Poly *q){
     PolyDestroy(&temp);
     return mul;
   }//if(!q->arr)
+  assert(!q->arr);
   return MulUnproperPolys(q, p);
 }
 
@@ -208,11 +234,6 @@ Poly PolyMul(const Poly *p, const Poly *q){
 }
 
 Poly PolyNeg(const Poly *p){
-  /*Poly *minus = malloc(sizeof(Poly));
-  minus->arr = NULL;
-  minus->coeff = -1;
-  Poly neg = PolyMul(minus, p);
-  free(minus);*/
   Poly minus = (Poly) {.arr = NULL, .coeff = -1};
   Poly neg = PolyMul(&minus, p);
   PolyDestroy(&minus);
@@ -223,7 +244,7 @@ Poly PolySub(const Poly *p, const Poly *q){
   Poly neg = PolyNeg(q);
   Poly sub = PolyAdd(p, &neg);
   PolyDestroy(&neg);
-  return sub; //tutaj może poprawić bo nie wiem jak bardzo te wskazniki dzialają
+  return sub;
 }
 
 static inline poly_coeff_t max(poly_coeff_t a, poly_coeff_t b){
@@ -240,7 +261,6 @@ poly_exp_t PolyDegBy(const Poly *p, size_t var_idx){
       temp = max(temp, PolyDegBy(&(p->arr[i].p), var_idx - 1));
     return temp;
   }
-  //var_idx == 0
   if(p->arr == NULL) return 0;
   return p->arr[p->size - 1].exp; //bo są posortowane rosnąco
 }
@@ -276,6 +296,12 @@ bool PolyIsEq(const Poly *p, const Poly *q){
   return false;
 }
 
+/**
+ * Podnosi @p x do potęgi @p exp.
+ * @param[in] x : baza @f$p@f$
+ * @param[in] exp : wykładnik @f$q@f$
+ * @return @f$x^exp@f$
+ */
 static inline poly_coeff_t pow2(poly_coeff_t x, poly_exp_t exp){
   if(exp == 0) return 1;
   if(exp == 1) return x;
