@@ -206,18 +206,14 @@ Poly PolyMul(const Poly *p, const Poly *q){
 }
 
 Poly PolyNeg(const Poly *p){
-  Poly *minus = malloc(sizeof(Poly));
+  /*Poly *minus = malloc(sizeof(Poly));
   minus->arr = NULL;
   minus->coeff = -1;
   Poly neg = PolyMul(minus, p);
-  free(minus);
-  return neg;
-  /*
+  free(minus);*/
   Poly minus = (Poly) {.arr = NULL, .coeff = -1};
   Poly neg = PolyMul(&minus, p);
-  free(minus);
   return neg;
-  */
 }
 
 Poly PolySub(const Poly *p, const Poly *q){
