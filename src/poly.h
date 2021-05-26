@@ -52,6 +52,9 @@ typedef struct Mono {
   poly_exp_t exp; ///< wykładnik
 } Mono;
 
+static inline Mono* SafeMalloc(size_t size);
+static inline Poly* SafeMallocPoly();
+
 /**
  * Daje wartość wykładnika jendomianu.
  * @param[in] m : jednomian

@@ -19,6 +19,13 @@ static inline Mono* SafeMalloc(size_t size){
   return ptr;
 }
 
+static inline Poly* SafeMallocPoly(){
+  Poly *ptr;
+  ptr = malloc(sizeof(Poly));
+  if(ptr == NULL) exit(1);
+  return ptr;
+}
+
 void PolyDestroy(Poly *p){
   if(p->arr){
     for(size_t i = 0; i < p->size; i++){
