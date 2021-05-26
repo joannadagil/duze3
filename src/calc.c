@@ -125,7 +125,7 @@ void POP() {
     Stack *old_stack = stack;
     stack = stack->next;
     PolyDestroy(&stack->poly);
-    free(stack);
+    free(old_stack);
   } else
     printf("ERROR w STACK UNDERFLOW\n");
 }
@@ -192,6 +192,8 @@ void ProcessCommand(char **line) {
     DEG();
   else if(strcmp(*line, is_eq) == 0)
     IS_EQ();
+  else if(strcmp(*line, sub) == 0)
+    SUB();    
   else if(strcmp(*line, neg) == 0)
     NEG();
   else if(strcmp(*line, mul) == 0)
