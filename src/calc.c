@@ -120,8 +120,10 @@ Poly ProcessPoly(char **line) {
     printf("Coeff in ProcessPoly\n");
     printf("%ld\n", atol(*line));
     poly = PolyFromCoeff(atol(*line));
+    printf("Poly from coeff fone\n");
     while(*line && **line != ',') 
       (*line)++;
+    printf("skipping done\n");
   }
   printf("done\n");
   return poly;
@@ -160,7 +162,7 @@ int main() {
     valid++;
     line = line_saver;
   }
-  //free(line);
+  free(line);
   PRINT(&(stack->poly));
 
 
