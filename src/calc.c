@@ -115,10 +115,12 @@ Poly ProcessPoly(char **line) {
     monos = realloc(monos, (i + 1) * sizeof(Mono));
     poly = PolyAddMonos(i, monos);
   } else {
+    printf("%ld\n", atol(*line));
     poly = PolyFromCoeff(atol(*line));
     while(*line && **line != ',') 
       (*line)++;
   }
+  printf("done\n");
   return poly;
 }
 
@@ -149,7 +151,7 @@ int main() {
     valid++;
     line = line_saver;
   }
-  free(line);
+  //free(line);
   PRINT(&(stack->poly));
 
 
