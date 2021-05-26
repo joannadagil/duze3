@@ -145,6 +145,7 @@ int ProcessLine(char **line) {
 
 
 int main() {
+  printf("start\n");
   stack = NULL;
   int read;
   char* line;
