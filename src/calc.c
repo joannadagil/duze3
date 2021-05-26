@@ -12,7 +12,6 @@
 #include <stdbool.h>
 
 #include "poly.h"
-#include "stack.c"
 
 #define DELIMITERS " \n"
 #define STARTING_SIZE 64
