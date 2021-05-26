@@ -55,7 +55,7 @@ void PRINT(Poly *poly);
 
 void MonoPrint(Mono *mono) {
   printf("(");
-  PRINT(&(mono->p));
+  PrintPoly(&(mono->p));
   printf(",");
   printf("%d", mono->exp);
   printf(")");
@@ -64,7 +64,7 @@ void MonoPrint(Mono *mono) {
 /**
  * wypisuje na standardowe wyjście wielomian z wierzchołka stosu
  */
-void PRINT(Poly *poly) {
+void PrintPoly(Poly *poly) {
   if(!poly->arr)
     printf("%ld", poly->coeff);
   else {
@@ -76,6 +76,11 @@ void PRINT(Poly *poly) {
     MonoPrint(&((poly->arr)[poly->size - 1]));
     //printf(")");
   }
+}
+
+void PRINT(Poly *poly) {
+  PrintPoly(poly);
+  printf("/n");
 }
 
 Poly ProcessPoly(char **line);
