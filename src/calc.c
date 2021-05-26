@@ -210,7 +210,7 @@ void ProcessCommand(char **line) {
     printf("%d\n", PolyIsZero(&stack->poly));
   else if(strcmp(*line, is_coeff) == 0)
     printf("%d\n", PolyIsCoeff(&stack->poly));
-  printf("%s\n", **line);
+  printf("%s\n", *line);
 }
 
 int ProcessLine(char **line) {
