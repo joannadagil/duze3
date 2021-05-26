@@ -148,9 +148,9 @@ int main() {
   printf("start\n");
   stack = NULL;
   int read;
-  char* line;
+  char* line = NULL;
   char* line_saver;
-  size_t size = STARTING_SIZE;
+  size_t size;// = STARTING_SIZE;
   printf("just before getline\n");
   while((read = getline(&line, &size, stdin)) != -1) {
     if(errno  == ENOMEM) exit(1);
