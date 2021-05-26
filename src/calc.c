@@ -51,11 +51,11 @@ void ZERO() {
   stack = PolyPush(PolyZero(), stack);
 }
 
-void PolyPrint(Poly *poly);
+void PRINT(Poly *poly);
 
 void MonoPrint(Mono *mono) {
   printf("(");
-  PolyPrint(&(mono->p));
+  PRINT(&(mono->p));
   printf(",");
   printf("%d", mono->exp);
   printf(")");
