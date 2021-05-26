@@ -151,6 +151,7 @@ int main() {
   char* line;
   char* line_saver;
   size_t size = STARTING_SIZE;
+  printf("just before getline\n");
   while((read = getline(&line, &size, stdin)) != -1) {
     // if(errno  == ENOMEM) exit(1);
     printf("took getline\n");
