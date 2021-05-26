@@ -121,7 +121,7 @@ Poly ProcessPoly(char **line) {
     printf("%ld\n", atol(*line));
     poly = PolyFromCoeff(atol(*line));
     printf("Poly from coeff fone\n");
-    while(*line && **line != ',') 
+    while(**line && **line != ',') 
       (*line)++;
     printf("skipping done\n");
   }
