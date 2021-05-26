@@ -28,11 +28,11 @@ typedef struct Stack {
 
 Stack *stack;
 
-Stack* PolyPush(Poly p, Stack *s) {
+void PolyPush(Poly p) {
   Stack *new = malloc(sizeof(Stack));
-  new->next = s;
+  new->next = stack;
   new->poly = p;
-  return new;
+  stack = new;
 }
 
 void StackFree() {
@@ -40,15 +40,6 @@ void StackFree() {
     PolyDestroy(&(stack->poly));
     stack = stack->next;
   }
-}
-
-
-
-/**
- * wstawia na wierzchołek stosu wielomian tożsamościowo równy zeru
- */
-void ZERO() {
-  stack = PolyPush(PolyZero(), stack);
 }
 
 void PrintPoly(Poly *poly);
@@ -104,15 +95,12 @@ Mono ProcessMono(char **line) {
 }
 
 Poly ProcessPoly(char **line) {
-  //printf("in ProcessPoly\n");
   Poly poly;
   if(**line == '(') {
-    printf("monos in ProcessPoly\n");
     size_t size = STARTING_SIZE;
     size_t i = 1;
     Mono *monos = malloc(size * sizeof(Mono));
     monos[0] = ProcessMono(line); //(mono)
-    printf("first mono done\n");
     while(**line && **line == '+') {
       if(i == size) {
         size *= 2;
@@ -120,33 +108,114 @@ Poly ProcessPoly(char **line) {
       }
       (*line)++; // +
       monos[i] = ProcessMono(line); // (mono)
-      printf("next mono done\n");
       i++;
     }
     monos = realloc(monos, i * sizeof(Mono));
-    for(int j = 0; j<i; j++) {
-      MonoPrint(&monos[j]); printf("\n");
-    }
     poly = PolyAddMonos(i, monos);
   } else {
     poly = PolyFromCoeff(atol(*line));
     while(**line && **line != ',') 
       (*line)++;
   }
-  printf("done\n");
   return poly;
+}
+
+void POP() {
+  if(stack) {
+    Stack *old_stack = stack;
+    stack = stack->next;
+    PolyDestroy(&stack->poly);
+    free(stack);
+  } else
+    printf("ERROR w STACK UNDERFLOW\n");
+}
+
+void ADD() {
+  if(stack && stack->next) {
+    Poly new = PolyAdd(&stack->poly, &stack->next->poly);
+    POP(); POP();
+    PolyPush(new);
+  } else
+    printf("ERROR w STACK UNDERFLOW\n");
+}
+
+void MUL() {
+  if(stack && stack->next) {
+    Poly new = PolyMul(&stack->poly, &stack->next->poly);
+    POP(); POP();
+    PolyPush(new);
+  } else
+    printf("ERROR w STACK UNDERFLOW\n");
+}
+
+void NEG() {
+  if(stack) {
+    Poly new = PolyNeg(&stack->poly);
+    POP();
+    PolyPush(new);
+  } else
+    printf("ERROR w STACK UNDERFLOW\n");
+}
+
+void SUB() {
+  if(stack && stack->next) {
+    Poly new = PolySub(&stack->poly, &stack->next->poly);
+    POP(); POP();
+    PolyPush(new);
+  } else
+    printf("ERROR w STACK UNDERFLOW\n");
+}
+
+void IS_EQ() {
+  if(stack && stack->next)
+    printf("%d\n", PolyIsEq(&stack->poly, &stack->next->poly));
+  else
+    printf("ERROR w STACK UNDERFLOW\n");
+}
+
+void DEG() {
+  if(stack) {
+    printf("%d\n", PolyDeg(&stack->poly));
+  } else
+    printf("ERROR w STACK UNDERFLOW\n");
+}
+
+void ProcessCommand(char **line) {
+  char print[] = "PRINT", pop[] = "POP", deg[] = "DEG", is_eq[] = "IS_EQ";
+  char sub[] = "SUB", neg[] = "NEG", mul[] = "MUL", add[] = "ADD", zero[] = "ZERO";
+  char clone[] = "CLONE", is_zero[] = "IS_ZERO", is_coeff[] = "IS_COEFF";
+  if(strcmp(*line, print) == 0)
+    PRINT(&stack->poly);
+  else if(strcmp(*line, pop) == 0)
+    POP();
+  else if(strcmp(*line, deg) == 0)
+    DEG();
+  else if(strcmp(*line, is_eq) == 0)
+    IS_EQ();
+  else if(strcmp(*line, neg) == 0)
+    NEG();
+  else if(strcmp(*line, mul) == 0)
+    MUL();
+  else if(strcmp(*line, add) == 0)
+    ADD();
+  else if(strcmp(*line, zero) == 0)
+    PolyPush(PolyZero());
+  else if(strcmp(*line, clone) == 0)
+    PolyPush(PolyClone(&stack->poly));
+  else if(strcmp(*line, is_zero) == 0)
+    printf("%d\n", PolyIsZero(&stack->poly));
+  else if(strcmp(*line, is_coeff) == 0)
+    printf("%d\n", PolyIsCoeff(&stack->poly));
 }
 
 int ProcessLine(char **line) {
   //char* word = strtok(line, DELIMITERS);
   if('A' <= **line && **line <= 'Z') {
     printf("a\n");
-    //ProcessCommand(line);
+    ProcessCommand(line);
   }
-  else {
-    Poly poly = ProcessPoly(line);
-    stack = PolyPush(poly, stack);
-  }
+  else 
+    PolyPush(ProcessPoly(line));
   return 1;
 }
 
