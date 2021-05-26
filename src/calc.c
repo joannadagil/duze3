@@ -51,7 +51,7 @@ void ZERO() {
   stack = PolyPush(PolyZero(), stack);
 }
 
-void PRINT(Poly *poly);
+void PrintPoly(Poly *poly);
 
 void MonoPrint(Mono *mono) {
   printf("(");
