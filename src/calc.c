@@ -110,7 +110,7 @@ Poly ProcessPoly(char **line) {
     size_t i = 1;
     Mono *monos = malloc(size * sizeof(Mono));
     monos[0] = ProcessMono(line); //(mono)
-    while(**line != ',') {
+    while(**line && **line == '+') {
       if(i == size) {
         size *= 2;
         monos = realloc(monos, size * sizeof(Mono));
