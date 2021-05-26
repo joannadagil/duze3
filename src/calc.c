@@ -87,17 +87,19 @@ Poly ProcessPoly(char **line);
 
 Mono ProcessMono(char **line) {
   Mono mono;
-  (*line)++;
+  (*line)++; // (
   if(**line == '(') {
-    mono.p = ProcessPoly(line);
+    mono.p = ProcessPoly(line); // p
   } else {
     mono.p = PolyFromCoeff(atol(*line));
-    while(*line && **line != ',') 
+    while(*line && **line != ',') // p
       (*line)++;
   }
   (*line)++; // ,
   mono.exp = atoi(*line);
-  (*line)++;
+  while(**line && **line != ')') // exp
+      (*line)++;
+  (*line)++; // )
   return mono;
 }
 
