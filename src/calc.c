@@ -153,7 +153,7 @@ int main() {
   size_t size = STARTING_SIZE;
   printf("just before getline\n");
   while((read = getline(&line, &size, stdin)) != -1) {
-    // if(errno  == ENOMEM) exit(1);
+    if(errno  == ENOMEM) exit(1);
     printf("took getline\n");
     line_saver = line;
     int valid = ProcessLine(&line);
