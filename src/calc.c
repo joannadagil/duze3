@@ -97,8 +97,10 @@ Mono ProcessMono(char **line) {
 }
 
 Poly ProcessPoly(char **line) {
+  printf("in ProcessPoly\n");
   Poly poly;
   if(**line == '(') {
+    printf("monos in ProcessPoly\n");
     size_t size = STARTING_SIZE;
     size_t i = 1;
     Mono *monos = malloc(size * sizeof(Mono));
@@ -115,6 +117,7 @@ Poly ProcessPoly(char **line) {
     monos = realloc(monos, (i + 1) * sizeof(Mono));
     poly = PolyAddMonos(i, monos);
   } else {
+    printf("Coeff in ProcessPoly\n");
     printf("%ld\n", atol(*line));
     poly = PolyFromCoeff(atol(*line));
     while(*line && **line != ',') 
@@ -125,13 +128,16 @@ Poly ProcessPoly(char **line) {
 }
 
 int ProcessLine(char **line) {
+  printf("opened ProcessLine\n");
   //char* word = strtok(line, DELIMITERS);
   if('A' <= **line && **line <= 'Z') {
     printf("a\n");
     //ProcessCommand(line);
   }
   else {
+    printf("gonna go into ProessPoly\n");
     Poly poly = ProcessPoly(line);
+    printf("ProcessPoly done\n");
     stack = PolyPush(poly, stack);
   }
   return 1;
@@ -146,6 +152,7 @@ int main() {
   size_t size = STARTING_SIZE;
   while((read = getline(&line, &size, stdin)) != -1) {
     // if(errno  == ENOMEM) exit(1);
+    printf("took getline\n");
     line_saver = line;
     int valid = ProcessLine(&line);
     valid++;
