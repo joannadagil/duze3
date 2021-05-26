@@ -186,7 +186,7 @@ void ProcessCommand(char **line) {
   char clone[] = "CLONE", is_zero[] = "IS_ZERO", is_coeff[] = "IS_COEFF";
   if(strcmp(*line, print) == 0){
     PRINT(&stack->poly);
-    printf("prited\n")
+    printf("prited\n");
   }
   else if(strcmp(*line, pop) == 0)
     POP();
@@ -210,6 +210,7 @@ void ProcessCommand(char **line) {
     printf("%d\n", PolyIsZero(&stack->poly));
   else if(strcmp(*line, is_coeff) == 0)
     printf("%d\n", PolyIsCoeff(&stack->poly));
+  printf("%s\n", **line);
 }
 
 int ProcessLine(char **line) {
