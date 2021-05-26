@@ -184,8 +184,10 @@ void ProcessCommand(char **line) {
   char print[] = "PRINT", pop[] = "POP", deg[] = "DEG", is_eq[] = "IS_EQ";
   char sub[] = "SUB", neg[] = "NEG", mul[] = "MUL", add[] = "ADD", zero[] = "ZERO";
   char clone[] = "CLONE", is_zero[] = "IS_ZERO", is_coeff[] = "IS_COEFF";
-  if(strcmp(*line, print) == 0)
+  if(strcmp(*line, print) == 0){
     PRINT(&stack->poly);
+    printf("prited\n")
+  }
   else if(strcmp(*line, pop) == 0)
     POP();
   else if(strcmp(*line, deg) == 0)
@@ -213,7 +215,6 @@ void ProcessCommand(char **line) {
 int ProcessLine(char **line) {
   //char* word = strtok(line, DELIMITERS);
   if('A' <= **line && **line <= 'Z') {
-    printf("a\n");
     ProcessCommand(line);
   }
   else 
