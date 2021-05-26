@@ -5,12 +5,16 @@
   @date 2021
 */
 
+#define _GNU_SOURCE
+
 #include <assert.h>
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdlib.h>
 #include <stdbool.h>
 #include <stdio.h>
+#include <string.h>
+#include <errno.h>
 
 #include "poly.h"
 
@@ -33,7 +37,7 @@ Stack* PolyPush(Poly p, Stack *s) {
 
 void StackFree() {
   while(stack != NULL) {
-    PolyDestroy(stack->poly);
+    PolyDestroy(&(stack->poly));
     stack = stack->next;
   }
 }
@@ -118,14 +122,14 @@ Poly ProcessPoly(char **line) {
   return poly;
 }
 
-int ProcessLine(char *line) {
+int ProcessLine(char **line) {
   //char* word = strtok(line, DELIMITERS);
-  if('A' <= *line && *line <= 'Z') {
+  if('A' <= **line && **line <= 'Z') {
     printf("a\n");
     //ProcessCommand(line);
   }
   else {
-    Poly poly = ProcessPoly(&line);
+    Poly poly = ProcessPoly(line);
     stack = PolyPush(poly, stack);
   }
   return 1;
@@ -142,6 +146,7 @@ int main() {
     // if(errno  == ENOMEM) exit(1);
     line_saver = line;
     int valid = ProcessLine(&line);
+    valid++;
     line = line_saver;
   }
   free(line);
