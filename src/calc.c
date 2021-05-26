@@ -80,7 +80,7 @@ void PrintPoly(Poly *poly) {
 
 void PRINT(Poly *poly) {
   PrintPoly(poly);
-  printf("/n");
+  printf("\n");
 }
 
 Poly ProcessPoly(char **line);
@@ -119,7 +119,7 @@ Poly ProcessPoly(char **line) {
       monos[i] = ProcessMono(line); // (mono)
       i++;
     }
-    monos = realloc(monos, (i + 1) * sizeof(Mono));
+    monos = realloc(monos, i * sizeof(Mono));
     poly = PolyAddMonos(i, monos);
   } else {
     printf("Coeff in ProcessPoly\n");
