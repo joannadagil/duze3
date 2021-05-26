@@ -10,6 +10,7 @@
 #include <stddef.h>
 #include <stdlib.h>
 #include <stdbool.h>
+#include <stdio.h>
 
 #include "poly.h"
 
@@ -21,9 +22,10 @@ typedef struct Stack {
   struct Stack *next;
 } Stack;
 
+Stack *stack;
+
 Stack* PolyPush(Poly p, Stack *s) {
   Stack *new = malloc(sizeof(Stack));
-  new->which = 0;
   new->next = s;
   new->poly = p;
   return new;
@@ -36,7 +38,7 @@ void StackFree() {
   }
 }
 
-Stack *stack;
+
 
 /**
  * wstawia na wierzchołek stosu wielomian tożsamościowo równy zeru
@@ -49,9 +51,9 @@ void PolyPrint(Poly *poly);
 
 void MonoPrint(Mono *mono) {
   printf("(");
-  PolyPrint(&(m->p));
+  PolyPrint(&(mono->p));
   printf(",");
-  printf("%d", m->exp);
+  printf("%d", mono->exp);
   printf(")");
 }
 
@@ -60,7 +62,7 @@ void MonoPrint(Mono *mono) {
  */
 void PRINT(Poly *poly) {
   if(!poly->arr)
-    printf("%ld", p->coeff);
+    printf("%ld", poly->coeff);
   else {
     //printf("(");
     for(size_t i = 0; i < poly->size - 1; i++) {
@@ -72,10 +74,12 @@ void PRINT(Poly *poly) {
   }
 }
 
+Poly ProcessPoly(char **line);
+
 Mono ProcessMono(char **line) {
   Mono mono;
   (*line)++;
-  if((*line) == '(') {
+  if(**line == '(') {
     mono.p = ProcessPoly(line);
   } else {
     mono.p = PolyFromCoeff(atol(*line));
@@ -85,6 +89,7 @@ Mono ProcessMono(char **line) {
   (*line)++; // ,
   mono.exp = atoi(*line);
   (*line)++;
+  return mono;
 }
 
 Poly ProcessPoly(char **line) {
@@ -97,12 +102,13 @@ Poly ProcessPoly(char **line) {
     while(**line != ',') {
       if(i == size) {
         size *= 2;
-        monos = realloc(size * sizeof(Mono));
+        monos = realloc(monos, size * sizeof(Mono));
       }
       (*line)++; // +
       monos[i] = ProcessMono(line); // (mono)
       i++;
     }
+    monos = realloc(monos, (i + 1) * sizeof(Mono));
     poly = PolyAddMonos(i, monos);
   } else {
     poly = PolyFromCoeff(atol(*line));
@@ -114,23 +120,29 @@ Poly ProcessPoly(char **line) {
 
 int ProcessLine(char *line) {
   //char* word = strtok(line, DELIMITERS);
-  if('A' <= *line && *line <= 'Z')
-    ProcessCommand(line);
-  else {
-    Poly poly = ProcessPoly(line);
-    stack = PolyPush(poly);
+  if('A' <= *line && *line <= 'Z') {
+    printf("a\n");
+    //ProcessCommand(line);
   }
+  else {
+    Poly poly = ProcessPoly(&line);
+    stack = PolyPush(poly, stack);
+  }
+  return 1;
 }
 
 
 int main() {
-  stack = null;
+  stack = NULL;
   int read;
   char* line;
+  char* line_saver;
   size_t size = STARTING_SIZE;
   while((read = getline(&line, &size, stdin)) != -1) {
     // if(errno  == ENOMEM) exit(1);
-    valid = ProcessLine(line);
+    line_saver = line;
+    int valid = ProcessLine(&line);
+    line = line_saver;
   }
   free(line);
   PRINT(&(stack->poly));
