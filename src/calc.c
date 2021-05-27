@@ -131,6 +131,7 @@ void POP() {
 }
 
 void ADD() {
+  printf("started add\n");
   if(stack && stack->next) {
     Poly new = PolyAdd(&stack->poly, &stack->next->poly);
     POP(); POP();
