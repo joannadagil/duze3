@@ -236,7 +236,7 @@ int main() {
     line = line_saver;
   }
   free(line);
-  PRINT(&(stack->poly));
+  StackFree();
 
 
   return 0;
