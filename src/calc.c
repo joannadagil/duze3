@@ -122,10 +122,15 @@ Poly ProcessPoly(char **line) {
 
 void POP() {
   if(stack) {
+    printf("started pop\n");
     Stack *old_stack = stack;
+    printf("old stack made\n");
     stack = stack->next;
+    printf("stack moved\n");
     PolyDestroy(&stack->poly);
+    printf("poly destroyed\n");
     free(old_stack);
+    printf("old stack moved\n");
   } else
     printf("ERROR w STACK UNDERFLOW\n");
 }
