@@ -69,8 +69,8 @@ void PrintPoly(Poly *poly) {
   }
 }
 
-void PRINT(Poly *poly) {
-  PrintPoly(poly);
+void PRINT() {
+  PrintPoly(&stack->poly);
   printf("\n");
 }
 
@@ -184,10 +184,8 @@ void ProcessCommand(char **line) {
   char print[] = "PRINT\n", pop[] = "POP\n", deg[] = "DEG\n", is_eq[] = "IS_EQ\n";
   char sub[] = "SUB\n", neg[] = "NEG\n", mul[] = "MUL\n", add[] = "ADD\n", zero[] = "ZERO\n";
   char clone[] = "CLONE\n", is_zero[] = "IS_ZERO\n", is_coeff[] = "IS_COEFF\n";
-  if(strcmp(*line, print) == 0){
-    PRINT(&stack->poly);
-    printf("prited\n");
-  }
+  if(strcmp(*line, print) == 0)
+    PRINT();
   else if(strcmp(*line, pop) == 0)
     POP();
   else if(strcmp(*line, deg) == 0)
