@@ -181,9 +181,9 @@ void DEG() {
 }
 
 void ProcessCommand(char **line) {
-  char print[] = "PRINT", pop[] = "POP", deg[] = "DEG", is_eq[] = "IS_EQ";
-  char sub[] = "SUB", neg[] = "NEG", mul[] = "MUL", add[] = "ADD", zero[] = "ZERO";
-  char clone[] = "CLONE", is_zero[] = "IS_ZERO", is_coeff[] = "IS_COEFF";
+  char print[] = "PRINT\n", pop[] = "POP\n", deg[] = "DEG\n", is_eq[] = "IS_EQ\n";
+  char sub[] = "SUB\n", neg[] = "NEG\n", mul[] = "MUL\n", add[] = "ADD\n", zero[] = "ZERO\n";
+  char clone[] = "CLONE\n", is_zero[] = "IS_ZERO\n", is_coeff[] = "IS_COEFF\n";
   if(strcmp(*line, print) == 0){
     PRINT(&stack->poly);
     printf("prited\n");
@@ -210,7 +210,7 @@ void ProcessCommand(char **line) {
     printf("%d\n", PolyIsZero(&stack->poly));
   else if(strcmp(*line, is_coeff) == 0)
     printf("%d\n", PolyIsCoeff(&stack->poly));
-  printf("%s\n", *line);
+  //printf("%s\n", *line);
 }
 
 int ProcessLine(char **line) {
