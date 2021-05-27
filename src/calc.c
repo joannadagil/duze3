@@ -133,9 +133,13 @@ void POP() {
 void ADD() {
   printf("started add\n");
   if(stack && stack->next) {
+    printf("positive if\n");
     Poly new = PolyAdd(&stack->poly, &stack->next->poly);
+    printf("poly new made\n");
     POP(); POP();
+    printf("poped\n");
     PolyPush(new);
+    printf("pushed\n");
   } else
     printf("ERROR w STACK UNDERFLOW\n");
 }
