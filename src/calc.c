@@ -26,7 +26,7 @@ typedef struct Stack {
   struct Stack *next;
 } Stack;
 
-Stack *stack;
+Stack *stack = NULL;
 
 void PolyPush(Poly p) {
   Stack *new = malloc(sizeof(Stack));
@@ -343,9 +343,7 @@ int main() {
 
   while((read = getline(&line, &size, stdin)) != -1) {
     if(errno  == ENOMEM) exit(1);
-    //printf("line no %ld read\n", no);
     ProcessLine(&line, no);
-    //printf("line processed\n");
     no++;
   }
 
