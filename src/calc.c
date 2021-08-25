@@ -101,7 +101,7 @@ Mono ProcessMono(char **line, bool *valid) {
     mono.p = ProcessPoly(line, valid); 
   } else {
     poly_coeff_t coeff = atol(*line);
-    printf("  mono coeff %ld\n", coeff);
+    printf("  in mono coeff %ld\n", coeff);
     mono.p = PolyFromCoeff(coeff);
     if(coeff == 0 && !is_zero(*line, ')'))
       *valid = false;
@@ -114,6 +114,7 @@ Mono ProcessMono(char **line, bool *valid) {
   (*line)++; 
   // exp
   mono.exp = atoi(*line);
+  printf("  mono exp %d \n", mono.exp);
   if(mono.exp == 0 && !is_zero(*line, ')'))
     *valid = false;
 
