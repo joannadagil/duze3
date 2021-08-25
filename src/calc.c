@@ -138,13 +138,13 @@ Poly ProcessPoly(char **line, bool *valid) {
     while(/**line && */**line == '+') {
       if(i == size) {
         size *= 2;
-        monos = realloc(monos, size * sizeof(Mono));
+        monos = realloc(monos, size * sizeof(Mono));//sprawdzic poprawnosc realloca
       }
       (*line)++; // +
       monos[i] = ProcessMono(line, valid); // (mono)
       i++;
     }
-    monos = realloc(monos, i * sizeof(Mono));
+    monos = realloc(monos, i * sizeof(Mono));//sprawdzic popr realloca
     poly = PolyAddMonos(i, monos);
   } else {  //unproper 
     poly_coeff_t coeff = atol(*line);
@@ -336,18 +336,17 @@ int main() {
   stack = NULL;
   int read;
   char* line = NULL;
+  char* save_line;
   long int no = 1;
   size_t size = STARTING_SIZE;
 
-  /*
   while((read = getline(&line, &size, stdin)) != -1) {
     if(errno  == ENOMEM) exit(1);
-    ProcessLine(&line, no);
+    save_line = line;
+
+    ProcessLine(&save_line, no);
     no++;
   }
-  */
-  Poly poly = PolyZero();
-  PolyPush(poly);
 
   free(line);
   StackFree();
