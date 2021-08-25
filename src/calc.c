@@ -317,22 +317,18 @@ void ProcessCommand(char *line, long int no) {
 }
 
 void ProcessLine(char **line, long int no) {
-  //("ProcessLine started\n");
-  //char* word = strtok(line, DELIMITERS);
   if('A' <= **line && **line <= 'Z')
     ProcessCommand(*line, no);
   else if(**line == '#' || **line == '\n') //ignoring
     return;
   else {
-    bool valid = true; //should i malloc that?
+    bool valid = true;
     Poly poly = ProcessPoly(line, &valid);
     if(valid)
       PolyPush(poly);
     else 
       fprintf(stderr, "ERROR %ld WRONG POLY\n", no);
   }
-  //return; //i dont need that raczej
-  //printf("ProcessLine ended\n");
 }
 
 
@@ -343,11 +339,15 @@ int main() {
   long int no = 1;
   size_t size = STARTING_SIZE;
 
+  /*
   while((read = getline(&line, &size, stdin)) != -1) {
     if(errno  == ENOMEM) exit(1);
     ProcessLine(&line, no);
     no++;
   }
+  */
+  Poly poly = PolyZero();
+  PolyPush(poly);
 
   free(line);
   StackFree();
