@@ -146,7 +146,7 @@ Poly ProcessPoly(char **line, bool *valid) {
     }
     monos = realloc(monos, i * sizeof(Mono));//sprawdzic popr realloca
     poly = PolyAddMonos(i, monos);
-    for(int j = 0; j < i; j++)
+    for(size_t j = 0; j < i; j++)
       MonoDestroy(&(monos[j]));
     free(monos);
   } else {  //unproper 
