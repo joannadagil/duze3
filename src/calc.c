@@ -36,9 +36,11 @@ void PolyPush(Poly p) {
 }
 
 void StackFree() {
-  while(stack != NULL) {
+  while(stack) {
     PolyDestroy(&(stack->poly));
+    Stack *old = stack;
     stack = stack->next;
+    free(old);
   }
 }
 
@@ -159,7 +161,7 @@ void POP(bool *flow) {
   if(stack) {
     Stack *old_stack = stack;
     stack = stack->next;
-    PolyDestroy(&old_stack->poly);
+    PolyDestroy(&(old_stack->poly));
     free(old_stack);
   } else
     *flow = false;
