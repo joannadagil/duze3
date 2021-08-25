@@ -146,6 +146,9 @@ Poly ProcessPoly(char **line, bool *valid) {
     }
     monos = realloc(monos, i * sizeof(Mono));//sprawdzic popr realloca
     poly = PolyAddMonos(i, monos);
+    for(int j = 0; j < i; j++)
+      MonoDestroy(&(monos[j]));
+    free(monos);
   } else {  //unproper 
     poly_coeff_t coeff = atol(*line);
     if(coeff == 0 && (!is_zero(*line, ',') || !is_zero(*line, '\n') || !is_zero(*line, 0))) // not sure about that ','
