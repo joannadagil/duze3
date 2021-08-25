@@ -254,17 +254,17 @@ void DEG_BY(char *line, long int no) {
   line += 7;
   size_t idx = strtoul(line, 0, 10); // 10? idk what that does
   if(*line == '\n') {
-    fprintf(stderr, "ERROR %ld DEG BY WRONG VARIABLE\n", no);
+    fprintf(stderr, "ERROR %ld DEG BY WRONG VARIABLE1\n", no);
     return;
   } // brak argumentu
   while('0' <= *line && *line <= '9')
     line++;
   if(*line != '\n') {
-    fprintf(stderr, "ERROR %ld DEG BY WRONG VARIABLE\n", no);
+    fprintf(stderr, "ERROR %ld DEG BY WRONG VARIABLE2\n", no);
     return;
   } // bledny argument
   if(idx == 0 && !is_zero(line, '\n')) {
-    fprintf(stderr, "ERROR %ld DEG BY WRONG VARIABLE\n", no);
+    fprintf(stderr, "ERROR %ld DEG BY WRONG VARIABLE3\n", no);
     return;
   }
   printf("%d", PolyDegBy(&stack->poly, idx));
