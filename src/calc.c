@@ -90,7 +90,6 @@ bool is_zero(char *line, char last) {
 
 // ( p , exp )
 Mono ProcessMono(char **line, bool *valid) {
-  printf("procesuje mono \n");
   Mono mono;
   // (
   if(*line && **line != '(')
@@ -101,7 +100,6 @@ Mono ProcessMono(char **line, bool *valid) {
     mono.p = ProcessPoly(line, valid); 
   } else {
     poly_coeff_t coeff = atol(*line);
-    printf("  in mono coeff %ld\n", coeff);
     mono.p = PolyFromCoeff(coeff);
     if(coeff == 0 && !is_zero(*line, ')'))
       *valid = false;
@@ -114,7 +112,6 @@ Mono ProcessMono(char **line, bool *valid) {
   (*line)++; 
   // exp
   mono.exp = atoi(*line);
-  printf("  mono exp %d \n", mono.exp);
   if(mono.exp == 0 && !is_zero(*line, ')'))
     *valid = false;
 
@@ -131,10 +128,8 @@ Mono ProcessMono(char **line, bool *valid) {
 // or
 // mono [ + mono]
 Poly ProcessPoly(char **line, bool *valid) {
-  printf("procesuje poly\n");
   Poly poly;
   if(**line == '(') { //proper poly
-    printf("  poly proper\n");
     size_t size = STARTING_SIZE;
     size_t i = 1;
     Mono *monos = malloc(size * sizeof(Mono));
@@ -152,13 +147,13 @@ Poly ProcessPoly(char **line, bool *valid) {
     //monos = realloc(monos, i * sizeof(Mono));//sprawdzic popr realloca
     poly = PolyAddMonos(i, monos);
     /*for(size_t j = 0; j < i; j++)
-      MonoDestroy(&(monos[j]));*/
+      MonoDestroy(&(monos[j]));*/ //bc przyjmuje na wlasnosc zawartosc tablicy
     free(monos);
   } else {  //unproper 
     poly_coeff_t coeff = atol(*line);
     if(coeff == 0 && (!is_zero(*line, ',') || !is_zero(*line, '\n') || !is_zero(*line, 0))) // not sure about that ','
       *valid = false;
-    printf("  poly coeff %ld\n", coeff);
+
     poly = PolyFromCoeff(coeff);
     while(*line && **line != ',' && **line != '\n' && **line != 0) 
       (*line)++;
