@@ -336,7 +336,9 @@ void ProcessCommand(char *line, long int no) {
 void ProcessLine(char **line, long int no) {
   if(**line == '#' || **line == '\n') //ignoring
     return;
-  if(('0' <= **line && **line <= '9') || **line == '(') {
+  if(('A' <= **line && **line <= 'Z') || ('a' <= **line && **line <= 'z'))
+    ProcessCommand(*line, no);
+  else {//(('0' <= **line && **line <= '9') || **line == '(') {
     bool valid = true;
     Poly poly = ProcessPoly(line, &valid);
     if(valid)
@@ -344,8 +346,7 @@ void ProcessLine(char **line, long int no) {
     else 
       fprintf(stderr, "ERROR %ld WRONG POLY\n", no);
   }
-  else //if('A' <= **line && **line <= 'Z')
-    ProcessCommand(*line, no);
+    
 
 }
 
