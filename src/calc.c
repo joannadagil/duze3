@@ -71,7 +71,11 @@ void PrintPoly(Poly *poly) {
   }
 }
 
-void PRINT() {
+void PRINT(bool *flow) {
+  if(!stack) {
+    *flow = false;
+    return;
+  }
   PrintPoly(&stack->poly);
   printf("\n");
 }
@@ -277,7 +281,7 @@ void ProcessCommand(char *line, long int no) {
   bool flow = true;
 
   if(strcmp(line, print) == 0)
-    PRINT();
+    PRINT(&flow);
   else if(strcmp(line, pop) == 0)
     POP(&flow);
   else if(strcmp(line, deg) == 0)
