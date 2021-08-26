@@ -263,10 +263,10 @@ void DEG_BY(char *line, long int no) {
     fprintf(stderr, "ERROR %ld DEG BY WRONG VARIABLE2\n", no);
     return;
   } // bledny argument
-  if(idx == 0 && !is_zero(line, '\n')) {
+  /*if(idx == 0 && !is_zero(line, '\n')) {
     fprintf(stderr, "ERROR %ld DEG BY WRONG VARIABLE3\n", no);
     return;
-  }
+  }*/
   printf("%d", PolyDegBy(&stack->poly, idx));
 }
 
