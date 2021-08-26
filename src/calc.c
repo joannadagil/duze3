@@ -105,7 +105,7 @@ Mono ProcessMono(char **line, bool *valid) {
   } else {
     poly_coeff_t coeff = atol(*line);
     mono.p = PolyFromCoeff(coeff);
-    if(coeff == 0 && !is_zero(*line, ')'))
+    if(coeff == 0 && !is_zero(*line, ','))
       *valid = false;
     while(*line && **line != ',') 
       (*line)++;
@@ -137,9 +137,8 @@ Poly ProcessPoly(char **line, bool *valid) {
     size_t size = STARTING_SIZE;
     size_t i = 1;
     Mono *monos = malloc(size * sizeof(Mono));
-    //printf("will start processing mono\n");
     monos[0] = ProcessMono(line, valid); //(mono)
-    while(/**line && */**line == '+') {
+    while(**line == '+') {
       if(i == size) {
         size *= 2;
         monos = realloc(monos, size * sizeof(Mono));//sprawdzic poprawnosc realloca
@@ -148,10 +147,7 @@ Poly ProcessPoly(char **line, bool *valid) {
       monos[i] = ProcessMono(line, valid); // (mono)
       i++;
     }
-    //monos = realloc(monos, i * sizeof(Mono));//sprawdzic popr realloca
     poly = PolyAddMonos(i, monos);
-    /*for(size_t j = 0; j < i; j++)
-      MonoDestroy(&(monos[j]));*/ //bc przyjmuje na wlasnosc zawartosc tablicy
     free(monos);
   } else {  //unproper 
     poly_coeff_t coeff = atol(*line);
@@ -258,13 +254,13 @@ void DEG_BY(char *line, long int no) {
   line += 7;
   size_t idx = strtoul(line, 0, 10); // 10? idk what that does
   if(*line == '\n') {
-    fprintf(stderr, "ERROR %ld DEG BY WRONG VARIABLE1\n", no);
+    fprintf(stderr, "ERROR %ld DEG BY WRONG VARIABLE\n", no);
     return;
   } // brak argumentu
   while('0' <= *line && *line <= '9')
     line++;
   if(*line != '\n') {
-    fprintf(stderr, "ERROR %ld DEG BY WRONG VARIABLE2\n", no);
+    fprintf(stderr, "ERROR %ld DEG BY WRONG VARIABLE\n", no);
     return;
   } // bledny argument
   /*if(idx == 0 && !is_zero(line, '\n')) {
@@ -272,6 +268,19 @@ void DEG_BY(char *line, long int no) {
     return;
   }*/
   printf("%d\n", PolyDegBy(&stack->poly, idx));
+}
+
+void IS_COEFF(bool *flow) {
+  if(stack)
+    printf("%d\n", PolyIsCoeff(&stack->poly));
+  else
+    *flow = false;
+}
+void IS_ZERO(bool *flow) {
+  if(stack)
+    printf("%d\n", PolyIsZero(&stack->poly));
+  else
+    *flow = false;
 }
 
 void ProcessCommand(char *line, long int no) {
@@ -301,9 +310,9 @@ void ProcessCommand(char *line, long int no) {
   else if(strcmp(line, clone) == 0)
     PolyPush(PolyClone(&stack->poly));
   else if(strcmp(line, is_zero) == 0)
-    printf("%d\n", PolyIsZero(&stack->poly));
+    IS_ZERO(&flow);
   else if(strcmp(line, is_coeff) == 0)
-    printf("%d\n", PolyIsCoeff(&stack->poly));
+    IS_COEFF(&flow);
   else if(line && *line == 'A' && 
           *(line + 1) == 'T' &&
           *(line + 2) == ' ')
@@ -325,11 +334,9 @@ void ProcessCommand(char *line, long int no) {
 }
 
 void ProcessLine(char **line, long int no) {
-  if('A' <= **line && **line <= 'Z')
-    ProcessCommand(*line, no);
-  else if(**line == '#' || **line == '\n') //ignoring
+  if(**line == '#' || **line == '\n') //ignoring
     return;
-  else {
+  if('0' <= **line && **line <= '9' || **line == '(') {
     bool valid = true;
     Poly poly = ProcessPoly(line, &valid);
     if(valid)
@@ -337,6 +344,9 @@ void ProcessLine(char **line, long int no) {
     else 
       fprintf(stderr, "ERROR %ld WRONG POLY\n", no);
   }
+  else //if('A' <= **line && **line <= 'Z')
+    ProcessCommand(*line, no);
+
 }
 
 
