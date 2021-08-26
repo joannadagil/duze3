@@ -336,7 +336,7 @@ void ProcessCommand(char *line, long int no) {
 void ProcessLine(char **line, long int no) {
   if(**line == '#' || **line == '\n') //ignoring
     return;
-  if('0' <= **line && **line <= '9' || **line == '(') {
+  if(('0' <= **line && **line <= '9') || **line == '(') {
     bool valid = true;
     Poly poly = ProcessPoly(line, &valid);
     if(valid)
