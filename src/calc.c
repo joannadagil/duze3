@@ -267,7 +267,7 @@ void DEG_BY(char *line, long int no) {
     fprintf(stderr, "ERROR %ld DEG BY WRONG VARIABLE3\n", no);
     return;
   }*/
-  printf("%d", PolyDegBy(&stack->poly, idx));
+  printf("%d\n", PolyDegBy(&stack->poly, idx));
 }
 
 void ProcessCommand(char *line, long int no) {
