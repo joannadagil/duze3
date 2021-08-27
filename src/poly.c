@@ -239,7 +239,7 @@ poly_exp_t PolyDegBy(const Poly *p, size_t var_idx){
   if(PolyIsZero(p)) return -1;
   if(var_idx > 0){
     poly_coeff_t temp = -1;
-    if(p->arr == NULL) return -1;
+    if(p->arr == NULL) return 0; //here changed
     for(size_t i = 0; i < p->size; i++)
       temp = max(temp, PolyDegBy(&(p->arr[i].p), var_idx - 1));
     return temp;
