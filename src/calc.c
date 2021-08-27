@@ -94,7 +94,7 @@ bool is_zero(char *line, char character, char* last) {
 
 // ( p , exp )
 Mono ProcessMono(char **line, bool *valid, char* last) {
-  //printf("zaczynam processowac mono\n");
+  printf("zaczynam processowac mono\n");
   Mono mono;
   // (
   if(*line && **line != '(')
@@ -133,7 +133,7 @@ Mono ProcessMono(char **line, bool *valid, char* last) {
   if(**line != ')') *valid = false;
   (*line)++;
   //if(!(**line == '+' || **line == '\n' || **line == 0)) *valid = false;
-  //printf("returnuje mono\n");
+  printf("returnuje mono\n");
   return mono;
 }
 
@@ -141,7 +141,7 @@ Mono ProcessMono(char **line, bool *valid, char* last) {
 // or
 // mono [ + mono]
 Poly ProcessPoly(char **line, bool *valid, char* last) {
- // printf("  zaczynam processowac poly\n");
+  printf("  zaczynam processowac poly\n");
   Poly poly = PolyZero();
   if(**line == '(') { //proper poly
     size_t size = STARTING_SIZE;
@@ -183,7 +183,7 @@ Poly ProcessPoly(char **line, bool *valid, char* last) {
     *valid = false;
     //printf("  false poly\n");
   }
-  //printf("  returnuje poly\n");
+  printf("  returnuje poly\n");
   return poly;
 }
 
