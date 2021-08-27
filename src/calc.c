@@ -160,7 +160,7 @@ Poly ProcessPoly(char **line, bool *valid, char* last) {
     monos[0] = ProcessMono(line, valid, last); //(mono)
     //printf("  po processowaniu pierwszego mono\n");
     if(**line == 0 && *line != last - 1) *valid = false;
-    while(**line == '+') {
+    while(**line == '+' && !(*(*line + 1) == '\n' || *(*line + 1) == 0)) {
       if(i == size) {
         size *= 2;
         monos = realloc(monos, size * sizeof(Mono));//sprawdzic poprawnosc realloca
