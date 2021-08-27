@@ -97,28 +97,34 @@ Mono ProcessMono(char **line, bool *valid, char* last) {
   printf("zaczynam processowac mono\n");
   Mono mono;
   // (
-  if(*line && **line != '(')
+  if(*line && **line != '(') {
     *valid = false;
+    return mono;
+  }
   (*line)++; 
+  //if(**line == '\n' || **line == 0)
   // p
-  if(**line == '(') {
+  mono.p = ProcessPoly(line, valid, last);
+  /*if(**line == '(') {
     mono.p = ProcessPoly(line, valid, last); 
   } else {
+    mono.p = ProcessPoly(line, valid, last);
     //if(**line == 0 || **line == '\n')
     //  *valid = false;
     //else
     //printf("przed wejsciem do process poly\n");
-      mono.p = ProcessPoly(line, valid, last);
-    /*poly_coeff_t coeff = atol(*line);
+    poly_coeff_t coeff = atol(*line);
     mono.p = PolyFromCoeff(coeff);
     if(coeff == 0 && !is_zero(*line, ',', last))
       *valid = false;
     while(*line && **line != ',') 
-      (*line)++;*/
-  }
+      (*line)++;
+  }*/
   // ,
-  if(**line != ',')
+  if(**line != ',') {
     *valid = false;
+    return mono;
+  }
   (*line)++; 
   // exp
   //printf("przed exp\n");
@@ -130,7 +136,10 @@ Mono ProcessMono(char **line, bool *valid, char* last) {
   //printf("po exp\n");
   while('0' <= **line && **line <= '9') (*line)++;
   // )
-  if(**line != ')') *valid = false;
+  if(**line != ')') {
+    *valid = false;
+    return mono;
+  }
   (*line)++;
   //if(!(**line == '+' || **line == '\n' || **line == 0)) *valid = false;
   printf("returnuje mono\n");
