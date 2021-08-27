@@ -170,10 +170,10 @@ Poly ProcessPoly(char **line, bool *valid, char* last) {
     char* endptr;
     poly_coeff_t coeff = strtol(*line, &endptr, 10);
     if(errno == ERANGE) *valid = false;
+    if(**line == '+' || **line == '-') (*line)++;
     if(coeff == 0 && !is_zero(*line, ',', last)) // not sure about that ','
       *valid = false;
     poly = PolyFromCoeff(coeff);
-    if(**line == '+' || **line == '-') (*line)++;
     while('0' <= **line && **line <= '9') (*line)++;
     //while(*line && **line != ',' && **line != '\n' && **line != 0) //jest endptr może uzyc niego a nie to?
     //  (*line)++;
