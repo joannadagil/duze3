@@ -164,7 +164,7 @@ Poly ProcessPoly(char **line, bool *valid, char* last) {
     if(!(**line == ',' || **line == '\n' || **line == 0)) *valid = false;
     poly = PolyAddMonos(i, monos);
     free(monos);
-  } else if(/* **line == '+' || **line == '-' || */('0' <= **line && **line <= '9')) {  //unproper 
+  } else if(**line == '+' || **line == '-' || ('0' <= **line && **line <= '9')) {  //unproper 
     //poly_coeff_t coeff = atol(*line);
     //printf("  poly unproper\n");
     char* endptr;
@@ -173,7 +173,7 @@ Poly ProcessPoly(char **line, bool *valid, char* last) {
     if(coeff == 0 && !is_zero(*line, ',', last)) // not sure about that ','
       *valid = false;
     poly = PolyFromCoeff(coeff);
-    //if(**line == '+' || **line == '-') (*line)++;
+    if(**line == '+' || **line == '-') (*line)++;
     while('0' <= **line && **line <= '9') (*line)++;
     //while(*line && **line != ',' && **line != '\n' && **line != 0) //jest endptr może uzyc niego a nie to?
     //  (*line)++;
