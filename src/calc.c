@@ -152,7 +152,7 @@ Poly ProcessProperPoly(char **line, bool *valid, char* last) {
     }
     (*line)++; // +
     monos[i] = ProcessMono(line, valid, last); // (mono)
-    i++;
+    if(*valid) i++; //here if
   }
   // monos = realloc(monos, i * sizeof(Mono));//sprawdzic poprawnosc realloca
 
