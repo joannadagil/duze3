@@ -169,6 +169,8 @@ Poly ProcessProperPoly(char **line, bool *valid, char* last) {
     monos[i] = ProcessMono(line, valid, last); // (mono)
     i++;
   }
+  monos = realloc(monos, i * sizeof(Mono));//sprawdzic poprawnosc realloca
+
   if(**line == 0 && *line != last - 1) *valid = false;
   if(!(**line == ',' || **line == '\n' || **line == 0)) *valid = false;
   poly = PolyAddMonos(i, monos);
