@@ -296,3 +296,33 @@ Poly PolyAt(const Poly *p, poly_coeff_t x){
   }
   return res;
 }
+
+Poly PolyOwnMonos(size_t count, Mono *monos){ //na razie tylko przekopiowalam polyaddmonos
+  if(count == 0) return PolyZero();
+  Mono monos2[count];
+  for(size_t i = 0; i < count; i++)
+    monos2[i] = MonoClone(&(monos[i]));
+  MonosSort(monos2, 0, count - 1);
+  Poly sum;
+  sum.arr = SafeMalloc(count);
+  size_t imonos = 1, isum = 0;
+  Mono last = MonoClone(&(monos2[0]));
+  while(imonos < count){
+    if(last.exp == monos2[imonos].exp){
+      Poly temp = PolyAdd(&(last.p), &(monos2[imonos].p));
+      PolyDestroy(&(last.p));
+      last.p = temp;
+    }else{
+      if(!PolyIsZero(&(last.p))){
+        (sum.arr)[isum] = last;
+        isum++;
+      }
+      last = MonoClone(&(monos2[imonos]));
+    }
+    imonos++;
+  }
+  sum = AddLast(isum, count, last, &sum);
+  freeing(count, monos2, monos);
+  sum = UnproperPoly(&sum);
+  return sum;
+}

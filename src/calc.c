@@ -92,6 +92,11 @@ bool is_zero(char *line, char character, char* last) {
   return false;
 }
 
+Mono FalseMono(bool *valid, Mono mono) {
+  *valid = false;
+  return mono;
+}
+
 // ( p , exp )
 Mono ProcessMono(char **line, bool *valid, char* last) {
   //printf("zaczynam processowac mono\n");
@@ -100,34 +105,17 @@ Mono ProcessMono(char **line, bool *valid, char* last) {
   mono.exp = 0;
   if(!*valid) return mono;
   // (
-  if(*line && **line != '(') {
-    *valid = false;
-    return mono;
-  }
+  if(*line && **line != '(') { return FalseMono(valid, mono); }
   (*line)++; 
-  //if(**line == '\n' || **line == 0)
   // p
   mono.p = ProcessPoly(line, valid, last);
-  /*if(**line == '(') {
-    mono.p = ProcessPoly(line, valid, last); 
-  } else {
-    mono.p = ProcessPoly(line, valid, last);
-    //if(**line == 0 || **line == '\n')
-    //  *valid = false;
-    //else
-    //printf("przed wejsciem do process poly\n");
-    poly_coeff_t coeff = atol(*line);
-    mono.p = PolyFromCoeff(coeff);
-    if(coeff == 0 && !is_zero(*line, ',', last))
-      *valid = false;
-    while(*line && **line != ',') 
-      (*line)++;
-  }*/
-  // ,
-  if(**line != ',') {
-    *valid = false;
+  if(!*valid) {
+    PolyDestroy(&(mono.p));
+    mono.p = PolyZero();
     return mono;
   }
+  // ,
+  if(**line != ',') { return FalseMono(valid, mono); }
   (*line)++; 
   // exp
   //printf("przed exp\n");
@@ -139,10 +127,7 @@ Mono ProcessMono(char **line, bool *valid, char* last) {
   //printf("po exp\n");
   while('0' <= **line && **line <= '9') (*line)++;
   // )
-  if(**line != ')') {
-    *valid = false;
-    return mono;
-  }
+  if(**line != ')') { return FalseMono(valid, mono); }
   (*line)++;
   //if(!(**line == '+' || **line == '\n' || **line == 0)) *valid = false;
   //printf("returnuje mono\n");
@@ -169,7 +154,7 @@ Poly ProcessProperPoly(char **line, bool *valid, char* last) {
     monos[i] = ProcessMono(line, valid, last); // (mono)
     i++;
   }
-  monos = realloc(monos, i * sizeof(Mono));//sprawdzic poprawnosc realloca
+  // monos = realloc(monos, i * sizeof(Mono));//sprawdzic poprawnosc realloca
 
   if(**line == 0 && *line != last - 1) *valid = false;
   if(!(**line == ',' || **line == '\n' || **line == 0)) *valid = false;
@@ -467,16 +452,3 @@ int main() {
   StackFree();
   return 0;
 }
-
-
-
-/*
-TODO
-
-* atol i atoi nie mogą zawierać + i - a te funkcje to umożliwiaja
-
-* process_poly jesli line wejsiowe to null
-
-* obsluga pustego pliku
-
-*/
