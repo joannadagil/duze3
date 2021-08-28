@@ -151,11 +151,9 @@ Mono ProcessMono(char **line, bool *valid, char* last) {
 
 Poly ProcessProperPoly(char **line, bool *valid, char* last) {
   Poly poly = PolyZero();
-
   size_t size = STARTING_SIZE;
   size_t i = 1;
   Mono *monos = malloc(size * sizeof(Mono));
-
   //printf("  przed processowaniem pierwszego mono\n");
   monos[0] = ProcessMono(line, valid, last); //(mono)
   //printf("  po processowaniu pierwszego mono\n");
@@ -173,7 +171,25 @@ Poly ProcessProperPoly(char **line, bool *valid, char* last) {
   if(!(**line == ',' || **line == '\n' || **line == 0)) *valid = false;
   poly = PolyAddMonos(i, monos);
   free(monos);
+  return poly;
+}
+Poly ProcessUnproperPoly(char **line, bool *valid, char* last) {
+  Poly poly = PolyZero();
 
+  //poly_coeff_t coeff = atol(*line);
+  //printf("  poly unproper\n");
+  char* endptr;
+  poly_coeff_t coeff = strtol(*line, &endptr, 10);
+  if(errno == ERANGE) *valid = false;
+  if(**line == '+' || **line == '-') (*line)++;
+  if(coeff == 0 && !is_zero(*line, ',', last)) // not sure about that ','
+    *valid = false;
+  poly = PolyFromCoeff(coeff);
+  while('0' <= **line && **line <= '9') (*line)++;
+  //while(*line && **line != ',' && **line != '\n' && **line != 0) //jest endptr może uzyc niego a nie to?
+  //  (*line)++;
+  if(**line == 0 && *line != last - 1) *valid = false;
+  if(!(**line == ',' || **line == '\n' || **line == 0)) *valid = false;
 
   return poly;
 }
@@ -212,20 +228,7 @@ Poly ProcessPoly(char **line, bool *valid, char* last) {
     poly = ProcessProperPoly(line, valid, last);
 
   } else if(**line == '+' || **line == '-' || ('0' <= **line && **line <= '9')) {  //unproper 
-    //poly_coeff_t coeff = atol(*line);
-    //printf("  poly unproper\n");
-    char* endptr;
-    poly_coeff_t coeff = strtol(*line, &endptr, 10);
-    if(errno == ERANGE) *valid = false;
-    if(**line == '+' || **line == '-') (*line)++;
-    if(coeff == 0 && !is_zero(*line, ',', last)) // not sure about that ','
-      *valid = false;
-    poly = PolyFromCoeff(coeff);
-    while('0' <= **line && **line <= '9') (*line)++;
-    //while(*line && **line != ',' && **line != '\n' && **line != 0) //jest endptr może uzyc niego a nie to?
-    //  (*line)++;
-    if(**line == 0 && *line != last - 1) *valid = false;
-    if(!(**line == ',' || **line == '\n' || **line == 0)) *valid = false;
+    poly = ProcessUnproperPoly(line, valid, last);
   } else {
     *valid = false;
     //printf("  false poly\n");
