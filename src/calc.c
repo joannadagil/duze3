@@ -154,7 +154,7 @@ Poly ProcessProperPoly(char **line, bool *valid, char* last) {
 
   size_t size = STARTING_SIZE;
   size_t i = 1;
-  Mono *monos 
+  Mono *monos;
   monos = malloc(size * sizeof(Mono));
   
   monos[0] = ProcessMono(line, valid, last); //(mono)
