@@ -151,12 +151,14 @@ Mono ProcessMono(char **line, bool *valid, char* last) {
 
 Poly ProcessProperPoly(char **line, bool *valid, char* last) {
   Poly poly = PolyZero();
+
   size_t size = STARTING_SIZE;
   size_t i = 1;
-  Mono *monos = malloc(size * sizeof(Mono));
-  //printf("  przed processowaniem pierwszego mono\n");
+  Mono *monos 
+  monos = malloc(size * sizeof(Mono));
+  
   monos[0] = ProcessMono(line, valid, last); //(mono)
-  //printf("  po processowaniu pierwszego mono\n");
+  
   if(**line == 0 && *line != last - 1) *valid = false;
   while(**line == '+' && !(*(*line + 1) == '\n' || *(*line + 1) == 0) && *valid) {
     if(i == size) {
@@ -173,6 +175,8 @@ Poly ProcessProperPoly(char **line, bool *valid, char* last) {
   free(monos);
   return poly;
 }
+
+
 Poly ProcessUnproperPoly(char **line, bool *valid, char* last) {
   Poly poly = PolyZero();
 
@@ -202,37 +206,12 @@ Poly ProcessPoly(char **line, bool *valid, char* last) {
   Poly poly = PolyZero();
   if(!*valid) return poly;
 
-  if(**line == '(') { //proper poly
-
-    /*size_t size = STARTING_SIZE;
-    size_t i = 1;
-    Mono *monos = malloc(size * sizeof(Mono));
-
-    //printf("  przed processowaniem pierwszego mono\n");
-    monos[0] = ProcessMono(line, valid, last); //(mono)
-    //printf("  po processowaniu pierwszego mono\n");
-    if(**line == 0 && *line != last - 1) *valid = false;
-    while(**line == '+' && !(*(*line + 1) == '\n' || *(*line + 1) == 0) && *valid) {
-      if(i == size) {
-        size *= 2;
-        monos = realloc(monos, size * sizeof(Mono));//sprawdzic poprawnosc realloca
-      }
-      (*line)++; // +
-      monos[i] = ProcessMono(line, valid, last); // (mono)
-      i++;
-    }
-    if(**line == 0 && *line != last - 1) *valid = false;
-    if(!(**line == ',' || **line == '\n' || **line == 0)) *valid = false;
-    poly = PolyAddMonos(i, monos);
-    free(monos);*/
+  if(**line == '(')  //proper poly
     poly = ProcessProperPoly(line, valid, last);
-
-  } else if(**line == '+' || **line == '-' || ('0' <= **line && **line <= '9')) {  //unproper 
+  else if(**line == '+' || **line == '-' || ('0' <= **line && **line <= '9'))  //unproper 
     poly = ProcessUnproperPoly(line, valid, last);
-  } else {
+  else 
     *valid = false;
-    //printf("  false poly\n");
-  }
   //printf("  returnuje poly\n");
   return poly;
 }
