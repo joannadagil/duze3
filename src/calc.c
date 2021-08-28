@@ -149,6 +149,35 @@ Mono ProcessMono(char **line, bool *valid, char* last) {
   return mono;
 }
 
+Poly ProcessProperPoly(char **line, bool *valid, char* last) {
+  Poly poly = PolyZero();
+
+  size_t size = STARTING_SIZE;
+  size_t i = 1;
+  Mono *monos = malloc(size * sizeof(Mono));
+
+  //printf("  przed processowaniem pierwszego mono\n");
+  monos[0] = ProcessMono(line, valid, last); //(mono)
+  //printf("  po processowaniu pierwszego mono\n");
+  if(**line == 0 && *line != last - 1) *valid = false;
+  while(**line == '+' && !(*(*line + 1) == '\n' || *(*line + 1) == 0) && *valid) {
+    if(i == size) {
+      size *= 2;
+      monos = realloc(monos, size * sizeof(Mono));//sprawdzic poprawnosc realloca
+    }
+    (*line)++; // +
+    monos[i] = ProcessMono(line, valid, last); // (mono)
+    i++;
+  }
+  if(**line == 0 && *line != last - 1) *valid = false;
+  if(!(**line == ',' || **line == '\n' || **line == 0)) *valid = false;
+  poly = PolyAddMonos(i, monos);
+  free(monos);
+
+
+  return poly;
+}
+
 // coeff
 // or
 // mono [ + mono]
@@ -156,9 +185,10 @@ Poly ProcessPoly(char **line, bool *valid, char* last) {
   //printf("  zaczynam processowac poly\n");
   Poly poly = PolyZero();
   if(!*valid) return poly;
+
   if(**line == '(') { //proper poly
 
-    size_t size = STARTING_SIZE;
+    /*size_t size = STARTING_SIZE;
     size_t i = 1;
     Mono *monos = malloc(size * sizeof(Mono));
 
@@ -178,7 +208,8 @@ Poly ProcessPoly(char **line, bool *valid, char* last) {
     if(**line == 0 && *line != last - 1) *valid = false;
     if(!(**line == ',' || **line == '\n' || **line == 0)) *valid = false;
     poly = PolyAddMonos(i, monos);
-    free(monos);
+    free(monos);*/
+    poly = ProcessProperPoly(line, valid, last);
 
   } else if(**line == '+' || **line == '-' || ('0' <= **line && **line <= '9')) {  //unproper 
     //poly_coeff_t coeff = atol(*line);
