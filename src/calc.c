@@ -96,6 +96,8 @@ bool is_zero(char *line, char character, char* last) {
 Mono ProcessMono(char **line, bool *valid, char* last) {
   //printf("zaczynam processowac mono\n");
   Mono mono;
+  mono.p = PolyZero();
+  mono.exp = 0;
   // (
   if(*line && **line != '(') {
     *valid = false;
@@ -152,10 +154,14 @@ Mono ProcessMono(char **line, bool *valid, char* last) {
 Poly ProcessPoly(char **line, bool *valid, char* last) {
   //printf("  zaczynam processowac poly\n");
   Poly poly = PolyZero();
+  if(!*valid) return poly;
   if(**line == '(') { //proper poly
+
     size_t size = STARTING_SIZE;
     size_t i = 1;
     Mono *monos = malloc(size * sizeof(Mono));
+
+
     //printf("  przed processowaniem pierwszego mono\n");
     monos[0] = ProcessMono(line, valid, last); //(mono)
     //printf("  po processowaniu pierwszego mono\n");
@@ -173,6 +179,7 @@ Poly ProcessPoly(char **line, bool *valid, char* last) {
     if(!(**line == ',' || **line == '\n' || **line == 0)) *valid = false;
     poly = PolyAddMonos(i, monos);
     free(monos);
+
   } else if(**line == '+' || **line == '-' || ('0' <= **line && **line <= '9')) {  //unproper 
     //poly_coeff_t coeff = atol(*line);
     //printf("  poly unproper\n");
