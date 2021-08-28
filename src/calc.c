@@ -98,6 +98,7 @@ Mono ProcessMono(char **line, bool *valid, char* last) {
   Mono mono;
   mono.p = PolyZero();
   mono.exp = 0;
+  if(!*valid) return mono;
   // (
   if(*line && **line != '(') {
     *valid = false;
@@ -160,7 +161,6 @@ Poly ProcessPoly(char **line, bool *valid, char* last) {
     size_t size = STARTING_SIZE;
     size_t i = 1;
     Mono *monos = malloc(size * sizeof(Mono));
-
 
     //printf("  przed processowaniem pierwszego mono\n");
     monos[0] = ProcessMono(line, valid, last); //(mono)
