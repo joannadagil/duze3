@@ -109,11 +109,11 @@ Mono ProcessMono(char **line, bool *valid, char* last) {
   (*line)++; 
   // p
   mono.p = ProcessPoly(line, valid, last);
-  if(!*valid) {
+  /*if(!*valid) {
     PolyDestroy(&(mono.p));
     mono.p = PolyZero();
     return mono;
-  }
+  }*/
   // ,
   if(**line != ',') { return FalseMono(valid, mono); }
   (*line)++; 
@@ -152,7 +152,8 @@ Poly ProcessProperPoly(char **line, bool *valid, char* last) {
     }
     (*line)++; // +
     monos[i] = ProcessMono(line, valid, last); // (mono)
-    if(*valid) i++; //here if
+    //if(*valid) i++; //here if
+    i++;
   }
   // monos = realloc(monos, i * sizeof(Mono));//sprawdzic poprawnosc realloca
 
