@@ -159,7 +159,11 @@ Poly ProcessProperPoly(char **line, bool *valid, char* last) {
 
   if(**line == 0 && *line != last - 1) *valid = false;
   if(!(**line == ',' || **line == '\n' || **line == 0)) *valid = false;
-  poly = PolyAddMonos(i, monos);
+  if(!*valid) {
+    for(size_t j = 0; j < i; j++)
+      PolyDestroy(&(monos[j].p));
+  } else 
+    poly = PolyAddMonos(i, monos);
   free(monos);
   return poly;
 }
@@ -319,8 +323,7 @@ void DEG_BY(char *line, long int no, char* last) {
     fprintf(stderr, "ERROR %ld DEG BY WRONG VARIABLE\n", no);
     return;
   }
-  while('0' <= *line && *line <= '9')
-    line++;
+  while('0' <= *line && *line <= '9') line++;
   if(!(*line == '\n' || line == last)) {
     fprintf(stderr, "ERROR %ld DEG BY WRONG VARIABLE\n", no);
     return;
@@ -346,11 +349,69 @@ void IS_COEFF(bool *flow) {
   else
     *flow = false;
 }
+
 void IS_ZERO(bool *flow) {
   if(stack)
     printf("%d\n", PolyIsZero(&stack->poly));
   else
     *flow = false;
+}
+
+void COMPOSE(char *line, long int no, char* last) {
+  if(!(*(line + 7) == ' ' || *(line + 7) == '\n' || *(line + 7) == '\t')) {
+    fprintf(stderr,"ERROR %ld WRONG COMMAND\n", no);
+    return;
+  }
+  if(*(line + 7) != ' ' || *(line + 7) == 0 || *(line + 8) == '\n') {
+    fprintf(stderr,"ERROR %ld COMPOSE WRONG PARAMETERE\n", no);
+    return;
+  }
+  line += 8;
+  char *endptr;
+  size_t k = strtoul(line, &endptr, 10);
+  if(errno == ERANGE) {
+    fprintf(stderr, "ERROR %ld COMPOSE WRONG PARAMETER\n", no);
+    return;
+  }
+  /*
+  if(k == 0 && !is_zero(line, '\n', last)) {
+    fprintf(stderr, "ERROR %ld COMPOSE WRONG PARAMETER\n", no);
+    return;
+  }*/
+  while('0' <= *line && *line <= '9') line++;
+  if(!(*line == '\n' || line == last)) {
+    fprintf(stderr, "ERROR %ld COMPOSE WRONG PARAMETER\n", no);
+    return;
+  } // bledny argument
+
+  
+  if(!stack) {
+      fprintf(stderr, "ERROR %ld STACK UNDERFLOW\n", no);
+      return;
+    }
+  Stack *stack_temp = stack->next;
+  Poly q[k];
+  for(size_t i = k; i > 0; i--) {
+    if(!stack_temp) {
+      fprintf(stderr, "ERROR %ld STACK UNDERFLOW\n", no);
+      return;
+    }
+    q[i - 1] = stack_temp->poly;
+    stack_temp = stack_temp->next;
+  }
+
+  printf("p = "); PrintPoly(&(stack->poly)); printf("\n");
+  printf("k = %ld\n", k);
+  printf("q[0] = "); PrintPoly(&(q[0])); printf("\n");
+
+  printf("przed PolyCompose\n");
+  Poly new = PolyCompose(&(stack->poly), k, q);
+  printf("przed POPowaniem\n");
+  bool flow; // blank bc we already checked that
+  for(size_t i = 0; i <= k; i++)
+    POP(&flow);
+  printf("przed PolyPush\n");
+  PolyPush(new);
 }
 
 void ProcessCommand(char *line, long int no, char* last) {
@@ -405,6 +466,14 @@ void ProcessCommand(char *line, long int no, char* last) {
           *(line + 5) == 'Y') //&&
           //*(line + 6) == ' ')
     DEG_BY(line, no, last);
+  else if(line && *line == 'C' && 
+          *(line + 1) == 'O' &&
+          *(line + 2) == 'M' &&
+          *(line + 3) == 'P' &&
+          *(line + 4) == 'O' &&
+          *(line + 5) == 'S' &&
+          *(line + 6) == 'E')
+    COMPOSE(line, no, last);
   else
     fprintf(stderr, "ERROR %ld WRONG COMMAND\n", no);
 
@@ -453,3 +522,5 @@ int main() {
   StackFree();
   return 0;
 }
+
+// ( (5,0)+(45,1)+(180,2)+(420,3)+(630,4)+(630,5)+(420,6)+(180,7)+(45,8)+(5,9), 9) 

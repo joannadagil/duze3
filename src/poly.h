@@ -277,7 +277,7 @@ bool PolyIsEq(const Poly *p, const Poly *q);
 /**
  * Podnosi @p x do potęgi @p exp.
  * @param[in] x : baza @f$p@f$
- * @param[in] exp : wykładnik @f$q@f$
+ * @param[in] exp : wykładnik @f$exp@f$
  * @return @f$x^exp@f$
  */
 poly_coeff_t pow2(poly_coeff_t x, poly_exp_t exp);
@@ -310,12 +310,34 @@ Poly PolyOwnMonos(size_t count, Mono *monos);
 /**
  * Sumuje listę jednomianów i tworzy z nich wielomian. Nie modyfikuje zawartości
  * tablicy @p monos. Jeśli jest to wymagane, to wykonuje pełne kopie jednomianów
- * z tablicy @p monos. Jeśli @p count lub @p monos jest równe zeru (NULL),
+ * z tablicy @p monos. Jeśli @p count lub @p monos jest równe zeru (NULL), 
  * tworzy wielomian tożsamościowo równy zeru.
  * @param[in] count : liczba jednomianów
  * @param[in] monos : tablica jednomianów
  * @return wielomian będący sumą jednomianów
  */
 Poly PolyCloneMonos(size_t count, const Mono monos[]);
+
+/**
+ * Podnosi wielomian @p p do potęgi @p exp.
+ * @param[in] p : wielomian będący bazą @f$p@f$
+ * @param[in] exp : wykładnik @f$exp@f$
+ * @return @f$p^exp@f$
+ */
+Poly PolyPow(const Poly *p, poly_exp_t exp); //szybkie potegownie poly
+
+/**
+ * Składa wielomiany. Dany jest wielomian @p p oraz @p k wielomianów q0, q1, q2, …, qk−1. 
+ * Niech l oznacza liczbę zmiennych wielomianu p i niech te zmienne są oznaczone 
+ * odpowiednio x0, x1, x2, …, xl−1. Wynikiem złożenia jest wielomian p(q0, q1, q2, …), 
+ * czyli wielomian powstający przez podstawienie w wielomianie p pod zmienną xi 
+ * wielomianu qi dla i=0,1,2,…,min(k,l)−1. Jeśli k<l, to pod zmienne xk, …, xl−1 
+ * podstawiamy zera. Na przykład, jeśli k=0, to wynikiem złożenia jest liczba p(0, 0, 0, …).
+ * @param[in] p : wielomian @f$p@f$
+ * @param[in] k : liczba wielomianów
+ * @param[in] q : tablica wielomianów
+ * @return wielomian będący złożeniem wielomianów
+ */
+Poly PolyCompose(const Poly *p, size_t k, const Poly q[]);
 
 #endif /* __POLY_H__ */
