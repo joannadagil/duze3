@@ -4059,7 +4059,7 @@ int main(int argc, char *argv[]) {
   printf("%s\n", argv[1]);
   printf("%s\n", test_list[1].name);
 
-  for (size_t i = 0; i < SIZE(test_list); ++i)
+  for (size_t i = 0; i < SIZE(test_list); i++)
     if (strcmp(argv[1], test_list[i].name) == 0)
       return test_list[i].function() ? TEST_PASS : TEST_FAIL;
 
