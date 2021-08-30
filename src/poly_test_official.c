@@ -4049,12 +4049,16 @@ static const test_list_t test_list[] = {
 };
 
 int main(int argc, char *argv[]) {
+  printf("staring!\n");
   if (argc != 2)
     return TEST_WRONG;
+
+  printf("here wherever it is\n");
 
   for (size_t i = 0; i < SIZE(test_list); ++i)
     if (strcmp(argv[1], test_list[i].name) == 0)
       return test_list[i].function() ? TEST_PASS : TEST_FAIL;
 
+  printf("ENDING?\n");
   return TEST_WRONG;
 }
