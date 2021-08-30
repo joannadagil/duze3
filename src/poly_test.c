@@ -4220,6 +4220,7 @@ int main() {
   {
     fprintf(stderr, "\r%ld/%ld", i, SIZE(test_list));
     OK &= test_list[i].function();
+    printf("here %ld\n", i);
   }
   fprintf(stderr, "\r       \r%s\n", OK ? "OK!" : "BŁĄD!");
   printf("here at the end!\n");
