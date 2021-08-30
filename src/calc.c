@@ -291,7 +291,9 @@ void DEG_BY(char *line, long int no, char* last) {
     fprintf(stderr, "ERROR %ld DEG BY WRONG VARIABLE\n", no);
     return;
   }
+  //printf("pointer before skipping = %p\n", line);
   while('0' <= *line && *line <= '9') line++;
+  //printf("pointer after skipping = %p\n", line);
   if(!(*line == '\n' || line == last)) {
     fprintf(stderr, "ERROR %ld DEG BY WRONG VARIABLE\n", no);
     return;
@@ -330,7 +332,7 @@ void COMPOSE(char *line, long int no, char* last) {
     return;
   }
   if(*(line + 7) != ' ' || *(line + 7) == 0 || *(line + 8) == '\n') {
-    fprintf(stderr,"ERROR %ld COMPOSE WRONG PARAMETERE\n", no);
+    fprintf(stderr,"ERROR %ld COMPOSE WRONG PARAMETER\n", no);
     return;
   }
   line += 8;
@@ -350,12 +352,24 @@ void COMPOSE(char *line, long int no, char* last) {
       return;
     }
   Stack *stack_temp = stack->next;
-  Poly q[k];
-  for(size_t i = k; i > 0; i--) {
+  //printf("BEGOR INICIALIZATION q[k]\n");
+  for(unsigned long long i = k; i > 0; i--) {
     if(!stack_temp) {
       fprintf(stderr, "ERROR %ld STACK UNDERFLOW\n", no);
       return;
     }
+    stack_temp = stack_temp->next;
+  }
+  Poly *q = malloc(k * sizeof(struct Poly));
+  //printf("k = %llu\n", k);
+  stack_temp = stack->next;
+  for(unsigned long long i = k; i > 0; i--) {
+    /* if(!stack_temp) {
+      fprintf(stderr, "ERROR %ld STACK UNDERFLOW\n", no);
+      free(q);
+      return;
+    } */
+    //printf("  i = %llu\n", i);
     q[i - 1] = stack_temp->poly;
     stack_temp = stack_temp->next;
   }
@@ -370,6 +384,7 @@ void COMPOSE(char *line, long int no, char* last) {
   for(size_t i = 0; i <= k; i++)
     POP(&flow);
   //printf("przed PolyPush\n");
+  free(q);
   PolyPush(new);
 }
 
@@ -382,9 +397,9 @@ void ProcessCommand(char *line, long int no, char* last) {
   bool flow = true;
 
   char *line_temp = line;
-  while(*line_temp != 0) 
+  while(!(*line_temp == 0 || *line_temp == ' ' || *line_temp == '\t'))
     line_temp++;
-  if(line_temp != last) {
+  if(!(line_temp == last || *line_temp == ' ' || *line_temp == '\t')) {
     fprintf(stderr, "ERROR %ld WRONG COMMAND\n", no);
     return;
   }

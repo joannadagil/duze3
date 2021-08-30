@@ -522,7 +522,8 @@ Poly PolyCompose(const Poly *p, size_t k, const Poly q[]){
       p_composed = PolyCompose(&((p->arr)[i]).p, k - 1, &q[1]);
       //printf("  p_com = "); PrintPoly2(&(p_composed)); printf("\n");
     }else{
-      q_pow = PolyZero();
+      if(p->arr[i].exp == 0) q_pow = PolyFromCoeff(1);
+      else q_pow = PolyZero();
       p_composed = PolyCompose(&((p->arr)[i]).p, k, q);
     }
     Poly addend = PolyMul(&q_pow, &p_composed);
