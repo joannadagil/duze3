@@ -4196,7 +4196,7 @@ static const test_list_t test_list[] = {
   TEST(DegreeOpChangeTest),   //19
   TEST(DegTest),              //20
   TEST(DegByTest),            //21
-  TEST(DegGroup),             //22
+  //TEST(DegGroup),             //22
   //TEST(MulTest1),             //23
   TEST(MulTest2),
   TEST(AddTest1),
