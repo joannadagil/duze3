@@ -4056,7 +4056,7 @@ int main(int argc, char *argv[]) {
     return TEST_WRONG;
 
   printf("here wherever it is\n ");
-  printf("%s\n",*argv);
+  printf("%s\n", argv[1]);
 
   for (size_t i = 0; i < SIZE(test_list); ++i)
     if (strcmp(argv[1], test_list[i].name) == 0)
