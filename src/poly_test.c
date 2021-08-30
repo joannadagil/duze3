@@ -4174,22 +4174,22 @@ typedef struct {
 // Dodano SimpleOwnMonosTest (Maurycy Wojda)
 // Dodano SimpleCloneMonosTest (Maurycy Wojda)
 static const test_list_t test_list[] = {
-  TEST(SimpleAddTest),
-  TEST(SimpleAddMonosTest),
-  TEST(SimpleOwnMonosTest),
-  TEST(SimpleCloneMonosTest),  
-  TEST(SimpleMulTest),
-  TEST(SimpleNegTest),
-  TEST(SimpleSubTest),
-  TEST(SimpleNegGroup),
-  TEST(SimpleDegByTest),
-  TEST(SimpleDegTest),
-  TEST(SimpleDegGroup),
-  TEST(SimpleIsEqTest),
-  TEST(SimpleAtTest),
-  TEST(OverflowTest),
-  TEST(SimpleArithmeticTest),
-  TEST(LongPolynomialTest),
+  TEST(SimpleAddTest),        //0
+  TEST(SimpleAddMonosTest),   //1
+  TEST(SimpleOwnMonosTest),   //2
+  TEST(SimpleCloneMonosTest), //3
+  TEST(SimpleMulTest),        //4
+  TEST(SimpleNegTest),        //5
+  TEST(SimpleSubTest),        //6
+  TEST(SimpleNegGroup),       //7
+  TEST(SimpleDegByTest),      //8
+  TEST(SimpleDegTest),        //9
+  TEST(SimpleDegGroup),       //10
+  TEST(SimpleIsEqTest),       //11
+  TEST(SimpleAtTest),         //12
+  TEST(OverflowTest),         //13
+  TEST(SimpleArithmeticTest), //14
+  //TEST(LongPolynomialTest),   //15
   TEST(AtTest1),
   TEST(AtTest2),
   TEST(AtGroup),
@@ -4214,12 +4214,15 @@ static const test_list_t test_list[] = {
 int main() {
 
   bool OK = true;
+
+  printf("start!\n");
   for (size_t i = 0; i < SIZE(test_list); ++i)
   {
     fprintf(stderr, "\r%ld/%ld", i, SIZE(test_list));
     OK &= test_list[i].function();
   }
   fprintf(stderr, "\r       \r%s\n", OK ? "OK!" : "BŁĄD!");
+  printf("here at the end!\n");
 
   return 0;
 }
