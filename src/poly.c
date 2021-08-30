@@ -461,6 +461,36 @@ Poly PolyCompose(const Poly *p, size_t k, const Poly q[]){
 }*/
 
 
+
+void PrintPoly2(Poly *poly);
+
+void MonoPrint2(Mono *mono) {
+  printf("(");
+  PrintPoly2(&(mono->p));
+  printf(",");
+  printf("%d", mono->exp);
+  printf(")");
+}
+
+/**
+ * wypisuje na standardowe wyjście wielomian z wierzchołka stosu
+ */
+void PrintPoly2(Poly *poly) {
+  if(!poly->arr)
+    printf("%ld", poly->coeff);
+  else {
+    //printf("(");
+    for(size_t i = 0; i < poly->size - 1; i++) {
+      MonoPrint2(&((poly->arr)[i]));
+      printf("+");
+    }
+    MonoPrint2(&((poly->arr)[poly->size - 1]));
+    //printf(")");
+  }
+}
+
+
+
 Poly PolyPow(const Poly *p, poly_exp_t exp){ //szybkie potegownie poly
   if(exp == 0) return PolyFromCoeff(1);
   if(exp == 1) return PolyClone(p);
@@ -469,35 +499,41 @@ Poly PolyPow(const Poly *p, poly_exp_t exp){ //szybkie potegownie poly
   if(exp % 2 == 0){
     PolyDestroy(&res);
     return res2;
-  } //else
-  Poly res3 = PolyMul(&res2, &res);
+  } else {
+  Poly res3 = PolyMul(&res2, p);
   PolyDestroy(&res);
   PolyDestroy(&res2);
   return res3;
+  }
 }
 
 Poly PolyCompose(const Poly *p, size_t k, const Poly q[]){
   if(!p->arr) return PolyClone(p);
   Poly result = PolyZero();
   for(size_t i = 0; i < p->size; i++){
-    printf("  in PolyCompose i = %ld\n", i);
+    //printf("  in PolyCompose i = %ld\n", i);
     Poly q_pow;
     Poly p_composed;
     if(k > 0){
+      //printf("  q    = "); PrintPoly2((q)); printf("\n");
+      //printf("  exp  = %d\n", p->arr[i].exp);
       q_pow = PolyPow(q, p->arr[i].exp);
+      //printf("  q_pow = "); PrintPoly2(&(q_pow)); printf("\n");
       p_composed = PolyCompose(&((p->arr)[i]).p, k - 1, &q[1]);
+      //printf("  p_com = "); PrintPoly2(&(p_composed)); printf("\n");
     }else{
       q_pow = PolyZero();
       p_composed = PolyCompose(&((p->arr)[i]).p, k, q);
     }
     Poly addend = PolyMul(&q_pow, &p_composed);
+    //printf("  add = "); PrintPoly2(&(addend)); printf("\n");
     Poly old_result = result;
     result = PolyAdd(&result, &addend);
+    //printf("  res = "); PrintPoly2(&result); printf("\n");
     PolyDestroy(&old_result);
     PolyDestroy(&addend);
     PolyDestroy(&p_composed);
     PolyDestroy(&q_pow);
-    i++;
   }
   return result;
 }

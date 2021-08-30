@@ -99,51 +99,32 @@ Mono FalseMono(bool *valid, Mono mono) {
 
 // ( p , exp )
 Mono ProcessMono(char **line, bool *valid, char* last) {
-  //printf("zaczynam processowac mono\n");
   Mono mono;
   mono.p = PolyZero();
   mono.exp = 0;
   if(!*valid) return mono;
-  // (
   if(*line && **line != '(') { return FalseMono(valid, mono); }
-  (*line)++; 
-  // p
-  mono.p = ProcessPoly(line, valid, last);
-  /*if(!*valid) {
-    PolyDestroy(&(mono.p));
-    mono.p = PolyZero();
-    return mono;
-  }*/
-  // ,
+  (*line)++; // (
+  mono.p = ProcessPoly(line, valid, last); // p
   if(**line != ',') { return FalseMono(valid, mono); }
-  (*line)++; 
-  // exp
-  //printf("przed exp\n");
+  (*line)++; // ,
   char* endptr;
-  mono.exp = strtol(*line, &endptr, 10);
+  mono.exp = strtol(*line, &endptr, 10); // exp
   if(errno == ERANGE) *valid = false;
   if(mono.exp == 0 && !is_zero(*line, ')', last))
     *valid = false;
-  //printf("po exp\n");
   while('0' <= **line && **line <= '9') (*line)++;
-  // )
   if(**line != ')') { return FalseMono(valid, mono); }
-  (*line)++;
-  //if(!(**line == '+' || **line == '\n' || **line == 0)) *valid = false;
-  //printf("returnuje mono\n");
+  (*line)++; // )
   return mono;
 }
 
 Poly ProcessProperPoly(char **line, bool *valid, char* last) {
   Poly poly = PolyZero();
-
   size_t size = STARTING_SIZE;
   size_t i = 1;
-  Mono *monos;
-  monos = malloc(size * sizeof(Mono));
-  
+  Mono *monos = malloc(size * sizeof(Mono));
   monos[0] = ProcessMono(line, valid, last); //(mono)
-  
   if(**line == 0 && *line != last - 1) *valid = false;
   while(**line == '+' && !(*(*line + 1) == '\n' || *(*line + 1) == 0) && *valid) {
     if(i == size) {
@@ -152,11 +133,8 @@ Poly ProcessProperPoly(char **line, bool *valid, char* last) {
     }
     (*line)++; // +
     monos[i] = ProcessMono(line, valid, last); // (mono)
-    //if(*valid) i++; //here if
     i++;
   }
-  // monos = realloc(monos, i * sizeof(Mono));//sprawdzic poprawnosc realloca
-
   if(**line == 0 && *line != last - 1) *valid = false;
   if(!(**line == ',' || **line == '\n' || **line == 0)) *valid = false;
   if(!*valid) {
@@ -171,22 +149,16 @@ Poly ProcessProperPoly(char **line, bool *valid, char* last) {
 
 Poly ProcessUnproperPoly(char **line, bool *valid, char* last) {
   Poly poly = PolyZero();
-
-  //poly_coeff_t coeff = atol(*line);
-  //printf("  poly unproper\n");
   char* endptr;
   poly_coeff_t coeff = strtol(*line, &endptr, 10);
   if(errno == ERANGE) *valid = false;
   if(**line == '+' || **line == '-') (*line)++;
-  if(coeff == 0 && !is_zero(*line, ',', last)) // not sure about that ','
+  if(coeff == 0 && !is_zero(*line, ',', last))
     *valid = false;
   poly = PolyFromCoeff(coeff);
   while('0' <= **line && **line <= '9') (*line)++;
-  //while(*line && **line != ',' && **line != '\n' && **line != 0) //jest endptr może uzyc niego a nie to?
-  //  (*line)++;
   if(**line == 0 && *line != last - 1) *valid = false;
   if(!(**line == ',' || **line == '\n' || **line == 0)) *valid = false;
-
   return poly;
 }
 
@@ -194,17 +166,14 @@ Poly ProcessUnproperPoly(char **line, bool *valid, char* last) {
 // or
 // mono [ + mono]
 Poly ProcessPoly(char **line, bool *valid, char* last) {
-  //printf("  zaczynam processowac poly\n");
   Poly poly = PolyZero();
   if(!*valid) return poly;
-
-  if(**line == '(')  //proper poly
+  if(**line == '(') 
     poly = ProcessProperPoly(line, valid, last);
   else if(**line == '+' || **line == '-' || ('0' <= **line && **line <= '9'))  //unproper 
     poly = ProcessUnproperPoly(line, valid, last);
   else 
     *valid = false;
-  //printf("  returnuje poly\n");
   return poly;
 }
 
@@ -293,7 +262,7 @@ void AT(char *line, long int no, char *last) {
   if(!(*line == '\n' || line == last)) {
     fprintf(stderr, "ERROR %ld AT WRONG VALUE\n", no);
     return;
-  } // bledny argument
+  }
   
   if(!stack) {
     fprintf(stderr, "ERROR %ld STACK UNDERFLOW\n", no);
@@ -317,8 +286,7 @@ void DEG_BY(char *line, long int no, char* last) {
   }
   line += 7;
   char* endptr;
-  size_t idx = strtoul(line, &endptr, 10); // 10? idk what that does
-  //printf("%ld\n", idx);
+  size_t idx = strtoul(line, &endptr, 10);
   if(errno == ERANGE) {
     fprintf(stderr, "ERROR %ld DEG BY WRONG VARIABLE\n", no);
     return;
@@ -327,12 +295,11 @@ void DEG_BY(char *line, long int no, char* last) {
   if(!(*line == '\n' || line == last)) {
     fprintf(stderr, "ERROR %ld DEG BY WRONG VARIABLE\n", no);
     return;
-  } // bledny argument
+  }
   if(!stack) {
     fprintf(stderr, "ERROR %ld STACK UNDERFLOW\n", no);
     return;
   }
-  //printf("%ld\n", idx);
   printf("%d\n", PolyDegBy(&(stack->poly), idx));
 }
 
@@ -368,23 +335,16 @@ void COMPOSE(char *line, long int no, char* last) {
   }
   line += 8;
   char *endptr;
-  size_t k = strtoul(line, &endptr, 10);
+  unsigned long long k = strtoull(line, &endptr, 10);
   if(errno == ERANGE) {
     fprintf(stderr, "ERROR %ld COMPOSE WRONG PARAMETER\n", no);
     return;
   }
-  /*
-  if(k == 0 && !is_zero(line, '\n', last)) {
-    fprintf(stderr, "ERROR %ld COMPOSE WRONG PARAMETER\n", no);
-    return;
-  }*/
   while('0' <= *line && *line <= '9') line++;
   if(!(*line == '\n' || line == last)) {
     fprintf(stderr, "ERROR %ld COMPOSE WRONG PARAMETER\n", no);
     return;
-  } // bledny argument
-
-  
+  }
   if(!stack) {
       fprintf(stderr, "ERROR %ld STACK UNDERFLOW\n", no);
       return;
@@ -399,18 +359,17 @@ void COMPOSE(char *line, long int no, char* last) {
     q[i - 1] = stack_temp->poly;
     stack_temp = stack_temp->next;
   }
+  //printf("p = "); PrintPoly(&(stack->poly)); printf("\n");
+  //printf("k = %ld\n", k);
+  //printf("q[0] = "); PrintPoly(&(q[0])); printf("\n");
 
-  printf("p = "); PrintPoly(&(stack->poly)); printf("\n");
-  printf("k = %ld\n", k);
-  printf("q[0] = "); PrintPoly(&(q[0])); printf("\n");
-
-  printf("przed PolyCompose\n");
+  //printf("przed PolyCompose\n");
   Poly new = PolyCompose(&(stack->poly), k, q);
-  printf("przed POPowaniem\n");
+  //printf("przed POPowaniem\n");
   bool flow; // blank bc we already checked that
   for(size_t i = 0; i <= k; i++)
     POP(&flow);
-  printf("przed PolyPush\n");
+  //printf("przed PolyPush\n");
   PolyPush(new);
 }
 
@@ -455,16 +414,14 @@ void ProcessCommand(char *line, long int no, char* last) {
   else if(strcmp(line, is_coeff) == 0 || strcmp(line, is_coeff2) == 0)
     IS_COEFF(&flow);
   else if(line && *line == 'A' && 
-          *(line + 1) == 'T')// &&
-          //*(line + 2) == ' ')
+          *(line + 1) == 'T')
     AT(line, no, last);
   else if(line && *line == 'D' && 
           *(line + 1) == 'E' &&
           *(line + 2) == 'G' &&
           *(line + 3) == '_' &&
           *(line + 4) == 'B' &&
-          *(line + 5) == 'Y') //&&
-          //*(line + 6) == ' ')
+          *(line + 5) == 'Y')
     DEG_BY(line, no, last);
   else if(line && *line == 'C' && 
           *(line + 1) == 'O' &&
