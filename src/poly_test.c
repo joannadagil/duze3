@@ -4190,14 +4190,14 @@ static const test_list_t test_list[] = {
   TEST(OverflowTest),         //13
   TEST(SimpleArithmeticTest), //14
   //TEST(LongPolynomialTest),   //15
-  TEST(AtTest1),
-  TEST(AtTest2),
-  TEST(AtGroup),
-  TEST(DegreeOpChangeTest),
-  TEST(DegTest),
-  TEST(DegByTest),
-  TEST(DegGroup),
-  TEST(MulTest1),
+  TEST(AtTest1),              //16
+  TEST(AtTest2),              //17
+  TEST(AtGroup),              //18
+  TEST(DegreeOpChangeTest),   //19
+  TEST(DegTest),              //20
+  TEST(DegByTest),            //21
+  TEST(DegGroup),             //22
+  //TEST(MulTest1),             //23
   TEST(MulTest2),
   TEST(AddTest1),
   TEST(AddTest2),
