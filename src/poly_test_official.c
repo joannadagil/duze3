@@ -4055,8 +4055,8 @@ int main(int argc, char *argv[]) {
   if (argc != 2)
     return TEST_WRONG;
 
-  printf("here wherever it is\n ");
-  printf("%s\n", argv[1]);
+  printf("here wherever it is\n");
+  printf("%saaa\n", argv[1]);
 
   for (size_t i = 0; i < SIZE(test_list); ++i)
     if (strcmp(argv[1], test_list[i].name) == 0)
