@@ -4198,17 +4198,17 @@ static const test_list_t test_list[] = {
   TEST(DegByTest),            //21
   //TEST(DegGroup),             //22
   //TEST(MulTest1),             //23
-  TEST(MulTest2),
-  TEST(AddTest1),
-  TEST(AddTest2),
-  TEST(SubTest1),
-  TEST(SubTest2),
-  TEST(ArithmeticGroup),
-  TEST(IsEqTest),
-  TEST(RarePolynomialTest),
-  TEST(MemoryThiefTest),
-  TEST(MemoryFreeTest),
-  TEST(MemoryGroup),
+  //TEST(MulTest2),             //24
+  TEST(AddTest1),             //25
+  TEST(AddTest2),             //26
+  TEST(SubTest1),             //27
+  TEST(SubTest2),             //28
+  TEST(ArithmeticGroup),      //29
+  TEST(IsEqTest),             //30
+  TEST(RarePolynomialTest),   //31
+  TEST(MemoryThiefTest),      //32
+  TEST(MemoryFreeTest),       //33
+  TEST(MemoryGroup),          //35
 };
 
 int main() {
