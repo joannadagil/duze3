@@ -10,6 +10,8 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include <stdio.h>
+
 /** DANE DO TESTÓW **/
 
 static const size_t conf_size = 10000;
