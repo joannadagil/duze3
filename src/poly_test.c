@@ -4201,8 +4201,8 @@ static const test_list_t test_list[] = {
   //TEST(MulTest2),             //24
   TEST(AddTest1),             //25
   //TEST(AddTest2),             //26
-  //TEST(SubTest1),             //27
-  TEST(SubTest2),             //28
+  TEST(SubTest1),             //27
+  //TEST(SubTest2),             //28
   TEST(ArithmeticGroup),      //29
   TEST(IsEqTest),             //30
   TEST(RarePolynomialTest),   //31
