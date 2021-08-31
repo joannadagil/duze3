@@ -191,13 +191,6 @@ void MonosSort(Mono monos[], size_t min, size_t max);
  */
 Poly AddLast(size_t isum, size_t count, Mono last, Poly *sum);
 
-/**
- * Zwalnia dane z PolyAddMonos.
- * @param[in] count : liczba jednomianów
- * @param[in] monos2 : tablica do zwolnienia całkowitego
- * @param[in] monos : tablica do zwolnienia zagłębienia
- */
-void freeing(size_t count, Mono monos2[], const Mono monos[]);
 
 /**
  * Sumuje listę jednomianów i tworzy z nich wielomian.

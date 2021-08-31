@@ -121,7 +121,7 @@ static inline void MonosSwap(Mono *a, Mono *b){
 void MonosSort(Mono monos[], size_t min, size_t max){
   if(min < max){
     size_t mid = min;
-    for(size_t i = min; i < max; i++){
+    for(size_t i = min; i < max; i++){  //max - 1
       if((monos[i]).exp < (monos[max]).exp){
         MonosSwap(&(monos[mid]), &(monos[i]));
         mid++;
@@ -150,6 +150,12 @@ Poly AddLast(size_t isum, size_t count, Mono last, Poly *sum){
   return *sum;
 }
 
+/**
+ * Zwalnia dane z PolyAddMonos.
+ * @param[in] count : liczba jednomianów
+ * @param[in] monos2 : tablica do zwolnienia całkowitego
+ * @param[in] monos : tablica do zwolnienia zagłębienia
+ */
 void freeing(size_t count, Mono monos2[], const Mono monos[]){
   for(size_t i = 0; i < count; i++){
     MonoDestroy(&(monos2[i]));
@@ -167,6 +173,8 @@ Poly PolyAddMonos(size_t count, const Mono monos[]){
   Mono monos2[count];
   for(size_t i = 0; i < count; i++)
     monos2[i] = MonoClone(&(monos[i]));
+
+  //Poly sum = PolyMonosInside(count, monos2);
   MonosSort(monos2, 0, count - 1);
   Poly sum;
   sum.arr = SafeMalloc(count);
@@ -187,8 +195,9 @@ Poly PolyAddMonos(size_t count, const Mono monos[]){
     imonos++;
   }
   sum = AddLast(isum, count, last, &sum);
-  freeing(count, monos2, monos);
   sum = UnproperPoly(&sum);
+  //
+  freeing(count, monos2, monos);
   return sum;
 }
 

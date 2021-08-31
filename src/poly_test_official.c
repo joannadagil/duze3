@@ -4015,19 +4015,19 @@ typedef struct {
 #define TEST(t) {#t, t}
 
 static const test_list_t test_list[] = {
-  TEST(SimpleAddTest),
-  TEST(SimpleAddMonosTest),
-  TEST(SimpleMulTest),
-  TEST(SimpleNegTest),
-  TEST(SimpleSubTest),
-  TEST(SimpleNegGroup),
-  TEST(SimpleDegByTest),
-  TEST(SimpleDegTest),
-  TEST(SimpleDegGroup),
-  TEST(SimpleIsEqTest),
-  TEST(SimpleAtTest),
-  TEST(OverflowTest),
-  TEST(SimpleArithmeticTest),
+  TEST(SimpleAddTest),//0
+  TEST(SimpleAddMonosTest),//1
+  TEST(SimpleMulTest),      //2
+  TEST(SimpleNegTest),      //3
+  TEST(SimpleSubTest),      //4
+  TEST(SimpleNegGroup),     //5
+  TEST(SimpleDegByTest),    //6
+  TEST(SimpleDegTest),      //7
+  TEST(SimpleDegGroup),     //8
+  TEST(SimpleIsEqTest),     //9
+  TEST(SimpleAtTest),       //10
+  TEST(OverflowTest),       //11
+  TEST(SimpleArithmeticTest),//12
   TEST(LongPolynomialTest),
   TEST(AtTest1),
   TEST(AtTest2),
@@ -4056,12 +4056,12 @@ int main(int argc, char *argv[]) {
     return TEST_WRONG;
 
   printf("here wherever it is\n");
-  printf("%s\n", argv[1]);
-  printf("%s\n", test_list[1].name);
 
-  for (size_t i = 0; i < SIZE(test_list); i++)
+  for (size_t i = 0; i < SIZE(test_list); i++){
     if (strcmp(argv[1], test_list[i].name) == 0)
       return test_list[i].function() ? TEST_PASS : TEST_FAIL;
+    printf("here %lu\n",i);
+  }
 
   printf("ENDING?\n");
   return TEST_WRONG;
