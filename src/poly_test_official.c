@@ -3992,6 +3992,7 @@ static bool ArithmeticGroup(void) {
     printf(res ? "true\n" : "false\n");
     res &= MulTest1();
     printf(res ? "true\n" : "false\n");
+    printf("teraz bedzie mul test2\n");
     res &= MulTest2();
     printf(res ? "true\n" : "false\n");
     res &= AddTest1();
