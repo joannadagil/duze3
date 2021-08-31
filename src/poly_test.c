@@ -4074,6 +4074,7 @@ int main(int argc, char *argv[]) {
 
   for (size_t i = 0; i < SIZE(test_list); i++){
     //if (strcmp(argv[1], test_list[i].name) == 0)
+    printf("%s", test_list[i].name);
       printf(test_list[i].function() ? "pass\n" : "fail\n");
       //return test_list[i].function() ? TEST_PASS : TEST_FAIL;
     //printf("here %lu\n",i);
