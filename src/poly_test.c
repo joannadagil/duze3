@@ -4043,7 +4043,7 @@ static const test_list_t test_list[] = {
   TEST(SimpleAtTest),       //10
   TEST(OverflowTest),       //11
   TEST(SimpleArithmeticTest),//12
-  TEST(LongPolynomialTest),
+  //TEST(LongPolynomialTest),
   TEST(AtTest1),
   TEST(AtTest2),
   TEST(AtGroup),
@@ -4074,7 +4074,7 @@ int main(int argc, char *argv[]) {
 
   for (size_t i = 0; i < SIZE(test_list); i++){
     //if (strcmp(argv[1], test_list[i].name) == 0)
-    printf("%s", test_list[i].name);
+    printf("%s\t\t", test_list[i].name);
       printf(test_list[i].function() ? "pass\n" : "fail\n");
       //return test_list[i].function() ? TEST_PASS : TEST_FAIL;
     //printf("here %lu\n",i);
