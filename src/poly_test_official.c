@@ -3989,19 +3989,19 @@ static bool DegGroup(void) {
 
 static bool ArithmeticGroup(void) {
     bool res = true;
-    printf(res ? "true" : "false");
+    printf(res ? "true\n" : "false\n");
     res &= MulTest1();
-    printf(res ? "true" : "false");
+    printf(res ? "true\n" : "false\n");
     res &= MulTest2();
-    printf(res ? "true" : "false");
+    printf(res ? "true\n" : "false\n");
     res &= AddTest1();
-    printf(res ? "true" : "false");
+    printf(res ? "true\n" : "false\n");
     res &= AddTest2();
-    printf(res ? "true" : "false");
+    printf(res ? "true\n" : "false\n");
     res &= SubTest2();
-    printf(res ? "true" : "false");
+    printf(res ? "true\n" : "false\n");
     res &= SubTest2();
-    printf(res ? "true" : "false");
+    printf(res ? "true\n" : "false\n");
   return MulTest1() && MulTest2() &&
          AddTest1() && AddTest2() &&
          SubTest1() && SubTest2();
