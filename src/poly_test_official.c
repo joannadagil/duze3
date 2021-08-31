@@ -3988,6 +3988,18 @@ static bool DegGroup(void) {
 }
 
 static bool ArithmeticGroup(void) {
+    bool res = MulTest1();
+    printf(res ? "true" : "false");
+    res &= MulTest2();
+    printf(res ? "true" : "false");
+    res &= AddTest1();
+    printf(res ? "true" : "false");
+    res &= AddTest2();
+    printf(res ? "true" : "false");
+    res &= SubTest2();
+    printf(res ? "true" : "false");
+    res &= SubTest2();
+    printf(res ? "true" : "false");
   return MulTest1() && MulTest2() &&
          AddTest1() && AddTest2() &&
          SubTest1() && SubTest2();
