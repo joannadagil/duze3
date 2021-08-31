@@ -9,6 +9,7 @@
 #include <stdarg.h>
 #include <stdlib.h>
 #include <string.h>
+
 #include <stdio.h>
 
 /** DANE DO TESTÓW **/
@@ -2903,49 +2904,6 @@ static bool TestAddMonos(size_t count, Mono monos[], Poly res) {
   return is_eq;
 }
 
-// Autor: Maurycy Wojda
-// (chociaż niczym się nie różni od AddMonos)
-static bool TestOwnMonos(size_t count, Mono monos[], Poly res) {
-  Poly b = PolyOwnMonos(count, monos);
-  bool is_eq = PolyIsEq(&b, &res);
-  PolyDestroy(&b);
-  PolyDestroy(&res);
-  return is_eq;
-}
-
-// Autor: Maurycy Wojda
-// Robimy głęboką kopię tablicy.
-// Potem wołamy PolyCloneMonos.
-// Sprawdzamy poprawność wyniku i zachowanie zawartości tablicy.
-// Zwalniamy kopię tablicy.
-// Niszczymy elementy tablicy wejściowej, bo nigdzie indziej
-// to nie jest robione, w przeciwieństwie do AddMonos i OwnMonos.
-static bool TestCloneMonos(size_t count, Mono monos[], Poly res) {
-  Mono *monosCopy = malloc(count * sizeof(Mono));
-  for (size_t i = 0; i < count; i++)
-    monosCopy[i] = MonoClone(&monos[i]);
-
-  Poly b = PolyCloneMonos(count, monos);
-  bool is_eq = PolyIsEq(&b, &res);
-
-  for (size_t i = 0; i < count; i++)
-  {
-    is_eq &= monosCopy[i].exp == monos[i].exp;
-    is_eq &= PolyIsEq(&monosCopy[i].p, &monos[i].p);
-  }
-
-  for (size_t i = 0; i < count; i++)
-    MonoDestroy(&monosCopy[i]);
-  free(monosCopy);
-
-  for (size_t i = 0; i < count; i++)
-    MonoDestroy(&monos[i]);
-
-  PolyDestroy(&b);
-  PolyDestroy(&res);
-  return is_eq;
-}
-
 static bool TestMul(Poly a, Poly b, Poly res) {
   return TestOpCopy(a, b, res, PolyMul);
 }
@@ -3053,143 +3011,36 @@ static bool SimpleAddTest(void) {
   return res;
 }
 
-// Autor: Maurycy Wojda
-// Funkcja pomocnicza do SimpleAddMonosTest
-static void prepM(Mono **m, Mono t[], size_t c) 
-{
-  *m = malloc(c * sizeof(Mono));
-  memcpy(*m, t, c * sizeof(Mono));
-}
-
-// Zmiany: Maurycy Wojda
-// Należy się upewnić, że AddMonos nie przyjęło tablicy na własność.
-// Sprawdzać z valgrindem!
 static bool SimpleAddMonosTest(void) {
   bool res = true;
-  Mono *m = NULL;
   {
-    Mono t[] = {M(C(-1), 0), M(C(1), 0)};
-    prepM(&m, t, 2);
+    Mono m[] = {M(C(-1), 0), M(C(1), 0)};
     res &= TestAddMonos(2, m, C(0));
-    free(m);
   }
   {
-    Mono t[] = {M(C(-1), 1), M(C(1), 1)};
-    prepM(&m, t, 2);
+    Mono m[] = {M(C(-1), 1), M(C(1), 1)};
     res &= TestAddMonos(2, m, C(0));
-    free(m);
   }
   {
-    Mono t[] = {M(C(1), 0), M(C(1), 0)};
-    prepM(&m, t, 2);
+    Mono m[] = {M(C(1), 0), M(C(1), 0)};
     res &= TestAddMonos(2, m, C(2));
-    free(m);
   }
   {
-    Mono t[] = {M(C(1), 1), M(C(1), 1)};
-    prepM(&m, t, 2);
+    Mono m[] = {M(C(1), 1), M(C(1), 1)};
     res &= TestAddMonos(2, m, P(C(2), 1));
-    free(m);
   }
   {
-    Mono t[] = {M(P(C(-1), 1), 0), M(P(C(1), 1), 0)};
-    prepM(&m, t, 2);
+    Mono m[] = {M(P(C(-1), 1), 0), M(P(C(1), 1), 0)};
     res &= TestAddMonos(2, m, C(0));
-    free(m);
   }
   {
-    Mono t[] = {M(P(C(-1), 0), 1),
+    Mono m[] = {M(P(C(-1), 0), 1),
                 M(P(C(1), 0), 1),
                 M(C(2), 0),
                 M(C(1), 1),
                 M(P(C(2), 1), 2),
                 M(P(C(2), 2), 2)};
-    prepM(&m, t, 6);
     res &= TestAddMonos(6, m, P(C(2), 0, C(1), 1, P(C(2), 1, C(2), 2), 2));
-    free(m);
-  }
-  return res;
-}
-
-// Autor: Maurycy Wojda
-// Należy się upewnić, że OwnMonos przyjęło tablicę na własność.
-// Sprawdzać z valgrindem!
-static bool SimpleOwnMonosTest(void) {
-  bool res = true;
-  Mono *m = NULL;
-  {
-    Mono t[] = {M(C(-1), 0), M(C(1), 0)};
-    prepM(&m, t, 2);
-    res &= TestOwnMonos(2, m, C(0));
-  }
-  {
-    Mono t[] = {M(C(-1), 1), M(C(1), 1)};
-    prepM(&m, t, 2);
-    res &= TestOwnMonos(2, m, C(0));
-  }
-  {
-    Mono t[] = {M(C(1), 0), M(C(1), 0)};
-    prepM(&m, t, 2);
-    res &= TestOwnMonos(2, m, C(2));
-  }
-  {
-    Mono t[] = {M(C(1), 1), M(C(1), 1)};
-    prepM(&m, t, 2);
-    res &= TestOwnMonos(2, m, P(C(2), 1));
-  }
-  {
-    Mono t[] = {M(P(C(-1), 1), 0), M(P(C(1), 1), 0)};
-    prepM(&m, t, 2);
-    res &= TestOwnMonos(2, m, C(0));
-  }
-  {
-    Mono t[] = {M(P(C(-1), 0), 1),
-                M(P(C(1), 0), 1),
-                M(C(2), 0),
-                M(C(1), 1),
-                M(P(C(2), 1), 2),
-                M(P(C(2), 2), 2)};
-    prepM(&m, t, 6);
-    res &= TestOwnMonos(6, m, P(C(2), 0, C(1), 1, P(C(2), 1, C(2), 2), 2));
-  }
-  return res;
-}
-
-// Autor: Maurycy Wojda
-// Należy się upewnić, że CloneMonos zrobiło pełną głęboką kopię.
-// Większość pracy jest wykonywane przez TestCloneMonos,
-// tam można znaleźć więcej wyjaśnień.
-// Sprawdzać z valgrindem!
-static bool SimpleCloneMonosTest(void) {
-  bool res = true;
-  {
-    Mono t[] = {M(C(-1), 0), M(C(1), 0)};
-    res &= TestCloneMonos(2, t, C(0));
-  }
-  {
-    Mono t[] = {M(C(-1), 1), M(C(1), 1)};
-    res &= TestCloneMonos(2, t, C(0));
-  }
-  {
-    Mono t[] = {M(C(1), 0), M(C(1), 0)};
-    res &= TestCloneMonos(2, t, C(2));
-  }
-  {
-    Mono t[] = {M(C(1), 1), M(C(1), 1)};
-    res &= TestCloneMonos(2, t, P(C(2), 1));
-  }
-  {
-    Mono t[] = {M(P(C(-1), 1), 0), M(P(C(1), 1), 0)};
-    res &= TestCloneMonos(2, t, C(0));
-  }
-  {
-    Mono t[] = {M(P(C(-1), 0), 1),
-                M(P(C(1), 0), 1),
-                M(C(2), 0),
-                M(C(1), 1),
-                M(P(C(2), 1), 2),
-                M(P(C(2), 2), 2)};
-    res &= TestCloneMonos(6, t, P(C(2), 0, C(1), 1, P(C(2), 1, C(2), 2), 2));
   }
   return res;
 }
@@ -3434,9 +3285,9 @@ static bool AtTest2(void) {
   Poly p3 = PolyAt(&p, 1);
   if (!PolyIsEq(&p3, &p2))
     result = false;
-  if ((long unsigned int)PolyDeg(&p) != (upper_size - 1) + (poly_depth * ((poly_exp_t)poly_size - 1)))
+  if (PolyDeg(&p) != (upper_size - 1) + (poly_depth * ((poly_exp_t)poly_size - 1)))
     result = false;
-  if ((long unsigned int)PolyDegBy(&p, 0) != upper_size - 1)
+  if (PolyDegBy(&p, 0) != upper_size - 1)
     result = false;
   if (PolyDegBy(&p, 1) != (poly_exp_t)poly_size - 1)
     result = false;
@@ -4137,6 +3988,21 @@ static bool DegGroup(void) {
 }
 
 static bool ArithmeticGroup(void) {
+    bool res = true;
+    printf(res ? "true\n" : "false\n");
+    res &= MulTest1();
+    printf(res ? "true\n" : "false\n");
+    printf("teraz bedzie mul test2\n");
+    res &= MulTest2();
+    printf(res ? "true\n" : "false\n");
+    res &= AddTest1();
+    printf(res ? "true\n" : "false\n");
+    res &= AddTest2();
+    printf(res ? "true\n" : "false\n");
+    res &= SubTest2();
+    printf(res ? "true\n" : "false\n");
+    res &= SubTest2();
+    printf(res ? "true\n" : "false\n");
   return MulTest1() && MulTest2() &&
          AddTest1() && AddTest2() &&
          SubTest1() && SubTest2();
@@ -4148,82 +4014,70 @@ static bool MemoryGroup(void) {
 
 /** URUCHAMIANIE TESTÓW **/
 
+// Możliwe wyniki testu
+#define TEST_PASS  0
+#define TEST_FAIL  125
+#define TEST_WRONG 2
+
 // Liczba elementów tablicy x
 #define SIZE(x) (sizeof (x) / sizeof (x)[0])
 
-/**
- * Struktura jednego elementu listy testów.
- */
 typedef struct {
-	/**
-	 * Nazwa testu.
-	 */
   char const *name;
-  /**
-   * Funkcja do wywołania.
-   */
   bool (*function)(void);
 } test_list_t;
 
 #define TEST(t) {#t, t}
 
-/**
- * Lista testów.
- */
-// Zmodyfikowano SimpleAddMonosTest (Maurycy Wojda)
-// Dodano SimpleOwnMonosTest (Maurycy Wojda)
-// Dodano SimpleCloneMonosTest (Maurycy Wojda)
 static const test_list_t test_list[] = {
-  TEST(SimpleAddTest),        //0
-  TEST(SimpleAddMonosTest),   //1
-  TEST(SimpleOwnMonosTest),   //2
-  TEST(SimpleCloneMonosTest), //3
-  TEST(SimpleMulTest),        //4
-  TEST(SimpleNegTest),        //5
-  TEST(SimpleSubTest),        //6
-  TEST(SimpleNegGroup),       //7
-  TEST(SimpleDegByTest),      //8
-  TEST(SimpleDegTest),        //9
-  TEST(SimpleDegGroup),       //10
-  TEST(SimpleIsEqTest),       //11
-  TEST(SimpleAtTest),         //12
-  TEST(OverflowTest),         //13
-  TEST(SimpleArithmeticTest), //14
-  //TEST(LongPolynomialTest),   //15
-  TEST(AtTest1),              //16
-  TEST(AtTest2),              //17
-  TEST(AtGroup),              //18
-  TEST(DegreeOpChangeTest),   //19
-  TEST(DegTest),              //20
-  TEST(DegByTest),            //21
-  //TEST(DegGroup),             //22
-  //TEST(MulTest1),             //23
-  //TEST(MulTest2),             //24
-  TEST(AddTest1),             //25
-  //TEST(AddTest2),             //26
-  //TEST(SubTest1),             //27
-  //TEST(SubTest2),             //28
-  TEST(ArithmeticGroup),      //29
-  TEST(IsEqTest),             //30
-  TEST(RarePolynomialTest),   //31
-  TEST(MemoryThiefTest),      //32
-  TEST(MemoryFreeTest),       //33
-  TEST(MemoryGroup),          //35
+  TEST(SimpleAddTest),//0
+  TEST(SimpleAddMonosTest),//1
+  TEST(SimpleMulTest),      //2
+  TEST(SimpleNegTest),      //3
+  TEST(SimpleSubTest),      //4
+  TEST(SimpleNegGroup),     //5
+  TEST(SimpleDegByTest),    //6
+  TEST(SimpleDegTest),      //7
+  TEST(SimpleDegGroup),     //8
+  TEST(SimpleIsEqTest),     //9
+  TEST(SimpleAtTest),       //10
+  TEST(OverflowTest),       //11
+  TEST(SimpleArithmeticTest),//12
+  TEST(LongPolynomialTest),
+  TEST(AtTest1),
+  TEST(AtTest2),
+  TEST(AtGroup),
+  TEST(DegreeOpChangeTest),
+  TEST(DegTest),
+  TEST(DegByTest),
+  TEST(DegGroup),
+  TEST(MulTest1),
+  TEST(MulTest2),
+  TEST(AddTest1),
+  TEST(AddTest2),
+  TEST(SubTest1),
+  TEST(SubTest2),
+  TEST(ArithmeticGroup),
+  TEST(IsEqTest),
+  TEST(RarePolynomialTest),
+  TEST(MemoryThiefTest),
+  TEST(MemoryFreeTest),
+  TEST(MemoryGroup),
 };
 
-int main() {
+int main(int argc, char *argv[]) {
+  printf("staring!\n");
+  if (argc != 2)
+    return TEST_WRONG;
 
-  bool OK = true;
+  printf("here wherever it is\n");
 
-  printf("start!\n");
-  for (size_t i = 0; i < SIZE(test_list); ++i)
-  {
-    fprintf(stderr, "\r%ld/%ld", i, SIZE(test_list));
-    OK &= test_list[i].function();
-    printf("here %ld\n", i);
+  for (size_t i = 0; i < SIZE(test_list); i++){
+    if (strcmp(argv[1], test_list[i].name) == 0)
+      return test_list[i].function() ? TEST_PASS : TEST_FAIL;
+    printf("here %lu\n",i);
   }
-  fprintf(stderr, "\r       \r%s\n", OK ? "OK!" : "BŁĄD!");
-  printf("here at the end!\n");
 
-  return 0;
+  printf("ENDING?\n");
+  return TEST_WRONG;
 }
