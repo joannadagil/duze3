@@ -1,4 +1,0 @@
-/home/asia/ipp/duze2/klon/release/CMakeFiles/rebuild_cache.dir
-/home/asia/ipp/duze2/klon/release/CMakeFiles/edit_cache.dir
-/home/asia/ipp/duze2/klon/release/CMakeFiles/poly_test.dir
-/home/asia/ipp/duze2/klon/release/CMakeFiles/poly.dir

@@ -3181,12 +3181,14 @@ static bool SimpleArithmeticTest(void) {
 static bool LongPolynomialTest(void) {
   bool res = true;
   Poly p = PolyFromCoeff(1);
+  printf("\n  starting \n");
   for (poly_exp_t poly_deg = 10; poly_deg < 90011 && res; poly_deg += 1000) {
     Mono *m = calloc((size_t)poly_deg + 1, sizeof (Mono)); // +1 bo wyraz wolny
     for (poly_exp_t i = 0; i <= poly_deg; ++i) {
       Poly tmp = PolyClone(&p);
       m[i] = MonoFromPoly(&tmp, i);
     }
+    printf("  poly_deg = %d\n", poly_deg);
     Poly long_p = PolyAddMonos((unsigned)poly_deg + 1, m);
     // long_p ma postać 1 + x + x^2 + ...
     free(m);
@@ -3791,6 +3793,38 @@ static poly_coeff_t *MullArray(size_t size1, const poly_coeff_t *arr_1,
   return res;
 }
 
+
+
+
+void PrintPoly3(Poly *poly);
+
+void MonoPrint3(Mono *mono) {
+  printf("(");
+  PrintPoly3(&(mono->p));
+  printf(",");
+  printf("%d", mono->exp);
+  printf(")");
+}
+
+/**
+ * wypisuje na standardowe wyjście wielomian z wierzchołka stosu
+ */
+void PrintPoly3(Poly *poly) {
+  if(!poly->arr)
+    printf("%ld", poly->coeff);
+  else {
+    //printf("(");
+    for(size_t i = 0; i < poly->size - 1; i++) {
+      MonoPrint3(&((poly->arr)[i]));
+      printf("+");
+    }
+    MonoPrint3(&((poly->arr)[poly->size - 1]));
+    //printf(")");
+  }
+}
+
+
+
 /**
  * Test mnożenia długich wielomianów.
  * Sprawdza poprawność i wydajność implementacji.
@@ -3804,21 +3838,32 @@ static bool MulTest2(void) {
   poly_exp_t *exp_list = calloc(2 * current_conf_size, sizeof (poly_exp_t));
   for (size_t i = 0; i < current_conf_size * 2; ++i)
     exp_list[i] = (poly_exp_t)i;
+  //printf("\n");
+  //printf("mulTest przystanek 1\n");
   while (poly_one_len < current_conf_size && good) {
+    //printf("poly_one_len = %lu \n", poly_one_len);
     poly_two_len = poly_one_len;
     Poly p1 = MakePoly(poly_one_len, coef_arr1, exp_list);
     while (poly_two_len < current_conf_size && good) {
       Poly p2 = MakePoly(poly_two_len, coef_arr2, exp_list);
+      //printf("    mulTest przystanek 2\n");
       poly_coeff_t *expected_res_coef = MullArray(poly_one_len, coef_arr1,
                                                   poly_two_len, coef_arr2);
+      //printf("    mulTest przystanek 3\n");
       Poly p_expected_res = MakePoly(poly_one_len + poly_two_len,
                                      expected_res_coef, exp_list);
+      //printf("    mulTest przystanek 3,5\n");
+      //printf("p1 = "); PrintPoly3(&p1); printf("\n");         
+      //printf("p2 = "); PrintPoly3(&p2); printf("\n"); 
+      //printf("    mulTest przystanek 3,6\n");                       
       Poly p_res = PolyMul(&p1, &p2);
+      //printf("    mulTest przystanek 4\n");
       if (!PolyIsEq(&p_expected_res, &p_res))
         good = false;
       PolyDestroy(&p2);
       PolyDestroy(&p_expected_res);
       PolyDestroy(&p_res);
+      //printf("    mulTest przystanek 5\n");
       free(expected_res_coef);
       poly_two_len *= step;
     }
@@ -4043,7 +4088,7 @@ static const test_list_t test_list[] = {
   TEST(SimpleAtTest),       //10
   TEST(OverflowTest),       //11
   TEST(SimpleArithmeticTest),//12
-  //TEST(LongPolynomialTest),
+  TEST(LongPolynomialTest),
   TEST(AtTest1),
   TEST(AtTest2),
   TEST(AtGroup),
@@ -4054,10 +4099,10 @@ static const test_list_t test_list[] = {
   TEST(MulTest1),
   TEST(MulTest2),
   TEST(AddTest1),
-  TEST(AddTest2),
+  //TEST(AddTest2),
   TEST(SubTest1),
-  TEST(SubTest2),
-  TEST(ArithmeticGroup),
+  //TEST(SubTest2),
+  //TEST(ArithmeticGroup),
   TEST(IsEqTest),
   TEST(RarePolynomialTest),
   TEST(MemoryThiefTest),
@@ -4070,7 +4115,7 @@ int main(int argc, char *argv[]) {
   if (argc != 2)
     return TEST_WRONG;
 
-  printf("here wherever it is\n");
+  //printf("here wherever it is\n");
 
   for (size_t i = 0; i < SIZE(test_list); i++){
     //if (strcmp(argv[1], test_list[i].name) == 0)
@@ -4079,6 +4124,7 @@ int main(int argc, char *argv[]) {
       //return test_list[i].function() ? TEST_PASS : TEST_FAIL;
     //printf("here %lu\n",i);
   }
+  printf("size = %lu\n", SIZE(test_list));
 
   printf("ENDING?\n");
   return TEST_WRONG;

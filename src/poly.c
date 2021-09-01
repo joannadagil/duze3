@@ -170,11 +170,11 @@ void freeing(size_t count, Mono monos2[], const Mono monos[]){
 
 Poly PolyAddMonos(size_t count, const Mono monos[]){
   if(count == 0) return PolyZero();
-  Mono monos2[count];
+  Mono *monos2 = malloc(count * sizeof(struct Mono));
   for(size_t i = 0; i < count; i++)
-    monos2[i] = MonoClone(&(monos[i]));
-
-  //Poly sum = PolyMonosInside(count, monos2);
+    monos2[i] = monos[i];
+    //monos2[i] = MonoClone(&(monos[i]));
+    
   MonosSort(monos2, 0, count - 1);
   Poly sum;
   sum.arr = SafeMalloc(count);
@@ -197,7 +197,19 @@ Poly PolyAddMonos(size_t count, const Mono monos[]){
   sum = AddLast(isum, count, last, &sum);
   sum = UnproperPoly(&sum);
   //
-  freeing(count, monos2, monos);
+  //freeing(count, monos2, monos);
+
+  for(size_t i = 0; i < count; i++){
+    //MonoDestroy(&(monos2[i]));
+    if(monos[i].p.arr){
+      for(size_t j = 0; j < monos[i].p.size; j++){
+        MonoDestroy(&(monos[i].p.arr[j]));
+      }
+      free(monos[i].p.arr);
+    }
+  }
+
+  free(monos2);
   return sum;
 }
 
@@ -215,7 +227,9 @@ Poly MulUnproperPolys(const Poly *p, const Poly *q){
 
 Poly PolyMul(const Poly *p, const Poly *q){
   if(!p->arr || !q->arr) return MulUnproperPolys(p, q);
+  //printf("here!1\n");
   Mono monos[p->size * q->size];
+  //printf("here!2\n");
   size_t imonos = 0;
   for(size_t ip = 0; ip < p->size; ip++){
     for(size_t iq = 0; iq < q->size; iq++){
@@ -223,7 +237,9 @@ Poly PolyMul(const Poly *p, const Poly *q){
       imonos++;
     }
   }
-  Poly mul = PolyAddMonos(p->size * q->size, monos);
+  //printf("here!3\n");
+  Poly mul = PolyAddMonos(imonos/*p->size * q->size*/, monos);
+  //printf("here!4\n");
   return mul;
 }
 
