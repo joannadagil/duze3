@@ -3181,14 +3181,14 @@ static bool SimpleArithmeticTest(void) {
 static bool LongPolynomialTest(void) {
   bool res = true;
   Poly p = PolyFromCoeff(1);
-  printf("\n  starting \n");
+  //printf("\n  starting \n");
   for (poly_exp_t poly_deg = 10; poly_deg < 90011 && res; poly_deg += 1000) {
     Mono *m = calloc((size_t)poly_deg + 1, sizeof (Mono)); // +1 bo wyraz wolny
     for (poly_exp_t i = 0; i <= poly_deg; ++i) {
       Poly tmp = PolyClone(&p);
       m[i] = MonoFromPoly(&tmp, i);
     }
-    printf("  poly_deg = %d\n", poly_deg);
+    //printf("  poly_deg = %d\n", poly_deg);
     Poly long_p = PolyAddMonos((unsigned)poly_deg + 1, m);
     // long_p ma postać 1 + x + x^2 + ...
     free(m);
@@ -4088,7 +4088,7 @@ static const test_list_t test_list[] = {
   TEST(SimpleAtTest),       //10
   TEST(OverflowTest),       //11
   TEST(SimpleArithmeticTest),//12
-  TEST(LongPolynomialTest),
+  //TEST(LongPolynomialTest),
   TEST(AtTest1),
   TEST(AtTest2),
   TEST(AtGroup),
@@ -4099,7 +4099,7 @@ static const test_list_t test_list[] = {
   TEST(MulTest1),
   TEST(MulTest2),
   TEST(AddTest1),
-  //TEST(AddTest2),
+  TEST(AddTest2),
   TEST(SubTest1),
   //TEST(SubTest2),
   //TEST(ArithmeticGroup),
