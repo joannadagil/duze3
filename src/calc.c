@@ -18,7 +18,6 @@
 
 #include "poly.h"
 
-#define DELIMITERS " \n"
 #define STARTING_SIZE 64
 
 typedef struct Stack {
@@ -46,6 +45,10 @@ void StackFree() {
 
 void PrintPoly(Poly *poly);
 
+/**
+ * Wypisuje na standardowe wyjście jednomian @p m
+ * @param[in] m : jednomian @f$p@f$
+ */
 void MonoPrint(Mono *mono) {
   printf("(");
   PrintPoly(&(mono->p));
@@ -55,22 +58,25 @@ void MonoPrint(Mono *mono) {
 }
 
 /**
- * wypisuje na standardowe wyjście wielomian z wierzchołka stosu
+ * Wypisuje na standardowe wyjście wielomian @p p
+ * @param[in] p : wielomian @f$p@f$
  */
 void PrintPoly(Poly *poly) {
   if(!poly->arr)
     printf("%ld", poly->coeff);
   else {
-    //printf("(");
     for(size_t i = 0; i < poly->size - 1; i++) {
       MonoPrint(&((poly->arr)[i]));
       printf("+");
     }
     MonoPrint(&((poly->arr)[poly->size - 1]));
-    //printf(")");
   }
 }
 
+/**
+ * Wypisuje na standardowe wyjście wielomian z wierzchołka stosu
+ * @param[in] flow : wskaźnik czy wystąpił błąd
+ */
 void PRINT(bool *flow) {
   if(!stack) {
     *flow = false;
@@ -82,6 +88,12 @@ void PRINT(bool *flow) {
 
 Poly ProcessPoly(char **line, bool *valid, char* last);
 
+/**
+ * Sprawdza czy wczytywana liczba z linii @p line to zero.
+ * @param[in] line : linia wejściowa z liczbą
+ * @param[in] no : numer linii
+ * @param[in] last : wskaźnik wskaźnik na null po ostatnim elemencie wczytanej linii
+ */
 bool is_zero(char *line, char character, char* last) {
   if(line && (*line == character || *line == '\n' || line == last))
     return false;
@@ -97,7 +109,12 @@ Mono FalseMono(bool *valid, Mono mono) {
   return mono;
 }
 
-// ( p , exp )
+/**
+ * Wczytuje jednomian z wczytanej linii @p line.
+ * @param[in] line : linia wejściowa z poleceniem
+ * @param[in] no : numer linii
+ * @param[in] last : wskaźnik wskaźnik na null po ostatnim elemencie wczytanej linii
+ */
 Mono ProcessMono(char **line, bool *valid, char* last) {
   Mono mono;
   mono.p = PolyZero();
@@ -119,21 +136,25 @@ Mono ProcessMono(char **line, bool *valid, char* last) {
   return mono;
 }
 
+/**
+ * Wczytuje właściwy wielomian (złożony nie tylko ze współczynnika) z wczytanej linii @p line.
+ * @param[in] line : linia wejściowa z poleceniem
+ * @param[in] no : numer linii
+ * @param[in] last : wskaźnik wskaźnik na null po ostatnim elemencie wczytanej linii
+ */
 Poly ProcessProperPoly(char **line, bool *valid, char* last) {
   Poly poly = PolyZero();
-  size_t size = STARTING_SIZE;
-  size_t i = 1;
+  size_t size = STARTING_SIZE, i = 1;
   Mono *monos = malloc(size * sizeof(Mono));
   monos[0] = ProcessMono(line, valid, last); //(mono)
   if(**line == 0 && *line != last - 1) *valid = false;
   while(**line == '+' && !(*(*line + 1) == '\n' || *(*line + 1) == 0) && *valid) {
     if(i == size) {
       size *= 2;
-      monos = realloc(monos, size * sizeof(Mono));//sprawdzic poprawnosc realloca
+      monos = realloc(monos, size * sizeof(Mono));
     }
-    (*line)++; // +
+    (*line)++; i++;
     monos[i] = ProcessMono(line, valid, last); // (mono)
-    i++;
   }
   if(**line == 0 && *line != last - 1) *valid = false;
   if(!(**line == ',' || **line == '\n' || **line == 0)) *valid = false;
@@ -146,7 +167,12 @@ Poly ProcessProperPoly(char **line, bool *valid, char* last) {
   return poly;
 }
 
-
+/**
+ * Wczytuje niewłaściwy wielomian (złożony tylko ze współczynnika) z wczytanej linii @p line.
+ * @param[in] line : linia wejściowa z poleceniem
+ * @param[in] no : numer linii
+ * @param[in] last : wskaźnik wskaźnik na null po ostatnim elemencie wczytanej linii
+ */
 Poly ProcessUnproperPoly(char **line, bool *valid, char* last) {
   Poly poly = PolyZero();
   char* endptr;
@@ -162,9 +188,12 @@ Poly ProcessUnproperPoly(char **line, bool *valid, char* last) {
   return poly;
 }
 
-// coeff
-// or
-// mono [ + mono]
+/**
+ * Wczytuje wielomian z wczytanej linii @p line.
+ * @param[in] line : linia wejściowa z poleceniem
+ * @param[in] no : numer linii
+ * @param[in] last : wskaźnik wskaźnik na null po ostatnim elemencie wczytanej linii
+ */
 Poly ProcessPoly(char **line, bool *valid, char* last) {
   Poly poly = PolyZero();
   if(!*valid) return poly;
@@ -177,6 +206,10 @@ Poly ProcessPoly(char **line, bool *valid, char* last) {
   return poly;
 }
 
+/**
+ * Usuwa wielomian z wierzchołka stosu
+ * @param[in] flow : wskaźnik czy wystąpił błąd
+ */
 void POP(bool *flow) {
   if(stack) {
     Stack *old_stack = stack;
@@ -187,6 +220,11 @@ void POP(bool *flow) {
     *flow = false;
 }
 
+/**
+ * Dodaje dwa wielomiany z wierzchu stosu, usuwa je i 
+ * wstawia na wierzchołek stosu ich sumę
+ * @param[in] flow : wskaźnik czy wystąpił błąd
+ */
 void ADD(bool *flow) {
   if(stack && stack->next) {
     Poly new = PolyAdd(&stack->poly, &stack->next->poly);
@@ -196,6 +234,11 @@ void ADD(bool *flow) {
     *flow = false;
 }
 
+/**
+ * Mnoży dwa wielomiany z wierzchu stosu, usuwa je i 
+ * wstawia na wierzchołek stosu ich iloczyn
+ * @param[in] flow : wskaźnik czy wystąpił błąd
+ */
 void MUL(bool *flow) {
   if(stack && stack->next) {
     Poly new = PolyMul(&stack->poly, &stack->next->poly);
@@ -205,6 +248,10 @@ void MUL(bool *flow) {
     *flow = false;
 }
 
+/**
+ * Neguje wielomian na wierzchołku stosu
+ * @param[in] flow : wskaźnik czy wystąpił błąd
+ */
 void NEG(bool *flow) {
   if(stack) {
     Poly new = PolyNeg(&stack->poly);
@@ -214,6 +261,11 @@ void NEG(bool *flow) {
     *flow = false;
 }
 
+/**
+ * Odejmuje od wielomianu z wierzchołka wielomian pod wierzchołkiem, 
+ * usuwa je i wstawia na wierzchołek stosu różnicę
+ * @param[in] flow : wskaźnik czy wystąpił błąd
+ */
 void SUB(bool *flow) {
   if(stack && stack->next) {
     Poly new = PolySub(&stack->poly, &stack->next->poly);
@@ -223,6 +275,11 @@ void SUB(bool *flow) {
     *flow = false;
 }
 
+/**
+ * Sprawdza, czy dwa wielomiany na wierzchu stosu są równe 
+ * – wypisuje na standardowe wyjście 0 lub 1
+ * @param[in] flow : wskaźnik czy wystąpił błąd
+ */
 void IS_EQ(bool *flow) {
   if(stack && stack->next)
     printf("%d\n", PolyIsEq(&stack->poly, &stack->next->poly));
@@ -230,6 +287,11 @@ void IS_EQ(bool *flow) {
     *flow = false;
 }
 
+/**
+ * Wypisuje na standardowe wyjście stopień wielomianu 
+ * (−1 dla wielomianu tożsamościowo równego zeru)
+ * @param[in] flow : wskaźnik czy wystąpił błąd
+ */
 void DEG(bool *flow) {
   if(stack) {
     printf("%d\n", PolyDeg(&stack->poly));
@@ -237,6 +299,13 @@ void DEG(bool *flow) {
     *flow = false;
 }
 
+/**
+ * Wylicza wartość wielomianu w punkcie @p x, usuwa wielomian z wierzchołka 
+ * i wstawia na stos wynik operacji.
+ * @param[in] line : linia wejściowa z poleceniem
+ * @param[in] no : numer linii
+ * @param[in] last : wskaźnik wskaźnik na null po ostatnim elemencie wczytanej linii
+ */
 void AT(char *line, long int no, char *last) {
   if(!(*(line + 2) == ' ' || *(line + 2) == '\n' || *(line + 2) == '\t')) {
     fprintf(stderr,"ERROR %ld WRONG COMMAND\n", no);
@@ -263,18 +332,23 @@ void AT(char *line, long int no, char *last) {
     fprintf(stderr, "ERROR %ld AT WRONG VALUE\n", no);
     return;
   }
-  
   if(!stack) {
     fprintf(stderr, "ERROR %ld STACK UNDERFLOW\n", no);
     return;
   }
-
   Poly new = PolyAt(&stack->poly, x);
   bool flow; // blank bc we already checked that
   POP(&flow);
   PolyPush(new);
 }
 
+/**
+ * Wypisuje na standardowe wyjście stopień wielomianu ze względu na zmienną 
+ * o numerze @p idx (−1 dla wielomianu tożsamościowo równego zeru)
+ * @param[in] line : linia wejściowa z poleceniem
+ * @param[in] no : numer linii
+ * @param[in] last : wskaźnik wskaźnik na null po ostatnim elemencie wczytanej linii
+ */
 void DEG_BY(char *line, long int no, char* last) {
   if(!(*(line + 6) == ' ' || *(line + 6) == '\n')  || *(line + 6) == '\t') {
     fprintf(stderr,"ERROR %ld WRONG COMMAND\n", no);
@@ -291,9 +365,7 @@ void DEG_BY(char *line, long int no, char* last) {
     fprintf(stderr, "ERROR %ld DEG BY WRONG VARIABLE\n", no);
     return;
   }
-  //printf("pointer before skipping = %p\n", line);
   while('0' <= *line && *line <= '9') line++;
-  //printf("pointer after skipping = %p\n", line);
   if(!(*line == '\n' || line == last)) {
     fprintf(stderr, "ERROR %ld DEG BY WRONG VARIABLE\n", no);
     return;
@@ -305,6 +377,10 @@ void DEG_BY(char *line, long int no, char* last) {
   printf("%d\n", PolyDegBy(&(stack->poly), idx));
 }
 
+/**
+ * Wstawia na stos kopię wielomianu z wierzchołka
+ * @param[in] flow : wskaźnik czy wystąpił błąd
+ */
 void CLONE(bool *flow) {
   if(stack)
     PolyPush(PolyClone(&stack->poly));
@@ -312,6 +388,11 @@ void CLONE(bool *flow) {
     *flow = false;
 }
 
+/**
+ * Sprawdza, czy wielomian na wierzchołku stosu jest współczynnikiem 
+ * – wypisuje na standardowe wyjście 0 lub 1
+ * @param[in] flow : wskaźnik czy wystąpił błąd
+ */
 void IS_COEFF(bool *flow) {
   if(stack)
     printf("%d\n", PolyIsCoeff(&stack->poly));
@@ -319,6 +400,11 @@ void IS_COEFF(bool *flow) {
     *flow = false;
 }
 
+/**
+ * Sprawdza, czy wielomian na wierzchołku stosu jest tożsamościowo równy zeru 
+ * – wypisuje na standardowe wyjście 0 lub 1
+ * @param[in] flow : wskaźnik czy wystąpił błąd
+ */
 void IS_ZERO(bool *flow) {
   if(stack)
     printf("%d\n", PolyIsZero(&stack->poly));
@@ -326,6 +412,13 @@ void IS_ZERO(bool *flow) {
     *flow = false;
 }
 
+/**
+ * Składa wielomian z wierzchu stosu z kolejnymi wielomianami ze stosu, usuwa użyte wielomiany
+ * i wstawia powstały na wierzch stosu.
+ * @param[in] line : linia wejściowa z poleceniem
+ * @param[in] no : numer linii
+ * @param[in] last : wskaźnik wskaźnik na null po ostatnim elemencie wczytanej linii
+ */
 void COMPOSE(char *line, long int no, char* last) {
   if(!(*(line + 7) == ' ' || *(line + 7) == '\n' || *(line + 7) == '\t')) {
     fprintf(stderr,"ERROR %ld WRONG COMMAND\n", no);
@@ -352,7 +445,6 @@ void COMPOSE(char *line, long int no, char* last) {
       return;
     }
   Stack *stack_temp = stack->next;
-  //printf("BEGOR INICIALIZATION q[k]\n");
   for(unsigned long long i = k; i > 0; i--) {
     if(!stack_temp) {
       fprintf(stderr, "ERROR %ld STACK UNDERFLOW\n", no);
@@ -361,33 +453,25 @@ void COMPOSE(char *line, long int no, char* last) {
     stack_temp = stack_temp->next;
   }
   Poly *q = malloc(k * sizeof(struct Poly));
-  //printf("k = %llu\n", k);
   stack_temp = stack->next;
   for(unsigned long long i = k; i > 0; i--) {
-    /* if(!stack_temp) {
-      fprintf(stderr, "ERROR %ld STACK UNDERFLOW\n", no);
-      free(q);
-      return;
-    } */
-    //printf("  i = %llu\n", i);
     q[i - 1] = stack_temp->poly;
     stack_temp = stack_temp->next;
   }
-  //printf("p = "); PrintPoly(&(stack->poly)); printf("\n");
-  //printf("k = %ld\n", k);
-  //printf("q[0] = "); PrintPoly(&(q[0])); printf("\n");
-
-  //printf("przed PolyCompose\n");
   Poly new = PolyCompose(&(stack->poly), k, q);
-  //printf("przed POPowaniem\n");
   bool flow; // blank bc we already checked that
   for(size_t i = 0; i <= k; i++)
     POP(&flow);
-  //printf("przed PolyPush\n");
   free(q);
   PolyPush(new);
 }
 
+/**
+ * Przetwarza komendę z wczytanej linii @p line.
+ * @param[in] line : linia wejściowa z poleceniem
+ * @param[in] no : numer linii
+ * @param[in] last : wskaźnik wskaźnik na null po ostatnim elemencie wczytanej linii
+ */
 void ProcessCommand(char *line, long int no, char* last) {
   char print[] = "PRINT\n", print2[] = "PRINT", pop[] = "POP\n", pop2[] = "POP", deg[] = "DEG\n", deg2[] = "DEG", is_eq[] = "IS_EQ\n", is_eq2[] = "IS_EQ";
   char sub[] = "SUB\n", neg[] = "NEG\n", mul[] = "MUL\n", add[] = "ADD\n", zero[] = "ZERO\n";
@@ -454,6 +538,12 @@ void ProcessCommand(char *line, long int no, char* last) {
 
 }
 
+/**
+ * Przetwarza wczytaną linię @p line.
+ * @param[in] line : linia wejściowa z poleceniem
+ * @param[in] no : numer linii
+ * @param[in] last : wskaźnik wskaźnik na null po ostatnim elemencie wczytanej linii
+ */
 void ProcessLine(char **line, long int no, char* last) {
   if(**line == '#' || **line == '\n') //ignoring
     return;
@@ -468,8 +558,6 @@ void ProcessLine(char **line, long int no, char* last) {
     else 
       fprintf(stderr, "ERROR %ld WRONG POLY\n", no);
   }
-    
-
 }
 
 
@@ -494,5 +582,3 @@ int main() {
   StackFree();
   return 0;
 }
-
-// ( (5,0)+(45,1)+(180,2)+(420,3)+(630,4)+(630,5)+(420,6)+(180,7)+(45,8)+(5,9), 9) 

@@ -10,8 +10,6 @@
 #include <stddef.h>
 #include <stdlib.h>
 
-#include <stdio.h> //usunac to ......................................
-
 #include "poly.h"
 
 static inline Mono* SafeMalloc(size_t size){
@@ -121,7 +119,7 @@ static inline void MonosSwap(Mono *a, Mono *b){
 void MonosSort(Mono monos[], size_t min, size_t max){
   if(min < max){
     size_t mid = min;
-    for(size_t i = min; i < max; i++){  //max - 1
+    for(size_t i = min; i < max; i++){
       if((monos[i]).exp < (monos[max]).exp){
         MonosSwap(&(monos[mid]), &(monos[i]));
         mid++;
@@ -151,44 +149,17 @@ Poly AddLast(size_t isum, size_t count, Mono last, Poly *sum){
 }
 
 /**
- * Zwalnia dane z PolyAddMonos.
- * @param[in] count : liczba jednomianów
- * @param[in] monos2 : tablica do zwolnienia całkowitego
- * @param[in] monos : tablica do zwolnienia zagłębienia
- */
-void freeing(size_t count, Mono monos2[], const Mono monos[]){
-  for(size_t i = 0; i < count; i++){
-    MonoDestroy(&(monos2[i]));
-    if(monos[i].p.arr){
-      for(size_t j = 0; j < monos[i].p.size; j++){
-        MonoDestroy(&(monos[i].p.arr[j]));
-      }
-      free(monos[i].p.arr);
-    }
-  }
-}
-
-/**
  * Wspólna część funkcji PolyAddMonos, PolyOwnMonos i PolyCloneMonos
  */
-Poly PolyMonosInside(size_t count, Mono monos[]);
-
-Poly PolyAddMonos(size_t count, const Mono monos[]){
-  if(count == 0) return PolyZero();
-  Mono *monos2 = SafeMalloc(count);
-  for(size_t i = 0; i < count; i++)
-    monos2[i] = monos[i];
-    //monos2[i] = MonoClone(&(monos[i]));
-
-  Poly sum = PolyMonosInside(count, monos2);
-  /*MonosSort(monos2, 0, count - 1);
+Poly PolyMonosInside(size_t count, Mono monos[]){
+  MonosSort(monos, 0, count - 1);
   Poly sum;
   sum.arr = SafeMalloc(count);
   size_t imonos = 1, isum = 0;
-  Mono last = MonoClone(&(monos2[0]));
+  Mono last = MonoClone(&(monos[0]));
   while(imonos < count){
-    if(last.exp == monos2[imonos].exp){
-      Poly temp = PolyAdd(&(last.p), &(monos2[imonos].p));
+    if(last.exp == monos[imonos].exp){
+      Poly temp = PolyAdd(&(last.p), &(monos[imonos].p));
       PolyDestroy(&(last.p));
       last.p = temp;
     }else{
@@ -196,25 +167,28 @@ Poly PolyAddMonos(size_t count, const Mono monos[]){
         (sum.arr)[isum] = last;
         isum++;
       }
-      last = MonoClone(&(monos2[imonos]));
+      last = MonoClone(&(monos[imonos]));
     }
     imonos++;
   }
   sum = AddLast(isum, count, last, &sum);
-  sum = UnproperPoly(&sum);*/
-  //
-  //freeing(count, monos2, monos);
+  sum = UnproperPoly(&sum);
+  return sum;
+}
 
+Poly PolyAddMonos(size_t count, const Mono monos[]){
+  if(count == 0) return PolyZero();
+  Mono *monos2 = SafeMalloc(count);
+  for(size_t i = 0; i < count; i++)
+    monos2[i] = monos[i];
+  Poly sum = PolyMonosInside(count, monos2);
   for(size_t i = 0; i < count; i++){
-    //MonoDestroy(&(monos2[i]));
     if(monos[i].p.arr){
-      for(size_t j = 0; j < monos[i].p.size; j++){
+      for(size_t j = 0; j < monos[i].p.size; j++)
         MonoDestroy(&(monos[i].p.arr[j]));
-      }
       free(monos[i].p.arr);
     }
   }
-
   free(monos2);
   return sum;
 }
@@ -241,7 +215,7 @@ Poly PolyMul(const Poly *p, const Poly *q){
       imonos++;
     }
   }
-  Poly mul = PolyAddMonos(imonos/*p->size * q->size*/, monos);
+  Poly mul = PolyAddMonos(imonos, monos);
   return mul;
 }
 
@@ -268,13 +242,13 @@ poly_exp_t PolyDegBy(const Poly *p, size_t var_idx){
   if(PolyIsZero(p)) return -1;
   if(var_idx > 0){
     poly_coeff_t temp = -1;
-    if(p->arr == NULL) return 0; //here changed
+    if(p->arr == NULL) return 0;
     for(size_t i = 0; i < p->size; i++)
       temp = max(temp, PolyDegBy(&(p->arr[i].p), var_idx - 1));
     return temp;
   }
   if(p->arr == NULL) return 0;
-  return p->arr[p->size - 1].exp; //bo są posortowane rosnąco
+  return p->arr[p->size - 1].exp;
 }
 
 poly_exp_t PolyDeg(const Poly *p){
@@ -302,10 +276,10 @@ bool PolyIsEq(const Poly *p, const Poly *q){
   return false;
 }
 
-poly_coeff_t pow2(poly_coeff_t x, poly_exp_t exp){
+poly_coeff_t pow(poly_coeff_t x, poly_exp_t exp){
   if(exp == 0) return 1;
   if(exp == 1) return x;
-  poly_coeff_t res = pow2(x, exp / 2);
+  poly_coeff_t res = pow(x, exp / 2);
   if(exp % 2 == 1)
     return res * res * x;
   return res * res;
@@ -315,7 +289,7 @@ Poly PolyAt(const Poly *p, poly_coeff_t x){
   if(p->arr == NULL) return PolyClone(p);
   Poly res = PolyZero();
   for(size_t i = 0; i < p->size; i++){
-    Poly temp0 = PolyFromCoeff(pow2(x, p->arr[i].exp));
+    Poly temp0 = PolyFromCoeff(pow(x, p->arr[i].exp));
     Poly temp1 = PolyMul(&(p->arr[i].p), &temp0);
     Poly temp2 = PolyAdd(&res, &temp1);
     PolyDestroy(&res);
@@ -328,187 +302,26 @@ Poly PolyAt(const Poly *p, poly_coeff_t x){
 
 Poly PolyOwnMonos(size_t count, Mono *monos){ 
   if(count == 0 || monos == NULL) return PolyZero();
-  
   Poly sum = PolyMonosInside(count, monos);
-  /*
-  MonosSort(monos, 0, count - 1);
-  Poly sum;
-  sum.arr = SafeMalloc(count);
-  size_t imonos = 1, isum = 0;
-  Mono last = MonoClone(&(monos[0]));
-  while(imonos < count){
-    if(last.exp == monos[imonos].exp){
-      Poly temp = PolyAdd(&(last.p), &(monos[imonos].p));
-      PolyDestroy(&(last.p));
-      last.p = temp;
-    }else{
-      if(!PolyIsZero(&(last.p))){
-        (sum.arr)[isum] = last;
-        isum++;
-      }
-      last = MonoClone(&(monos[imonos]));
-    }
-    imonos++;
-  }
-  sum = AddLast(isum, count, last, &sum);
-  sum = UnproperPoly(&sum);
-  */
   for(size_t i = 0; i < count; i++)
     MonoDestroy(&(monos[i]));
   free(monos);
   return sum;
 }
 
-/*
-void freeingClone(size_t count, Mono monos[]) {
-  for(size_t i = 0; i < count; i++){
-    MonoDestroy(&(monos[i]));
-  }
-}
-*/
-
 Poly PolyCloneMonos(size_t count, const Mono monos[]){
   if(count == 0 || monos == NULL) return PolyZero();
-  //Mono monos2[count];
   Mono *monos2 = SafeMalloc(count);
   for(size_t i = 0; i < count; i++)
     monos2[i] = MonoClone(&(monos[i]));
   Poly sum = PolyMonosInside(count, monos2);
-  /*
-  MonosSort(monos2, 0, count - 1);
-  Poly sum;
-  sum.arr = SafeMalloc(count);
-  size_t imonos = 1, isum = 0;
-  Mono last = MonoClone(&(monos2[0]));
-  while(imonos < count){
-    if(last.exp == monos2[imonos].exp){
-      Poly temp = PolyAdd(&(last.p), &(monos2[imonos].p));
-      PolyDestroy(&(last.p));
-      last.p = temp;
-    }else{
-      if(!PolyIsZero(&(last.p))){
-        (sum.arr)[isum] = last;
-        isum++;
-      }
-      last = MonoClone(&(monos2[imonos]));
-    }
-    imonos++;
-  }
-  sum = AddLast(isum, count, last, &sum);
-  sum = UnproperPoly(&sum);*/
-  //freeingClone(count, monos2);
   for(size_t i = 0; i < count; i++)
     MonoDestroy(&(monos2[i]));
-  free(monos2); //here
+  free(monos2);
   return sum;
 }
 
-Poly PolyMonosInside(size_t count, Mono monos[]){
-  MonosSort(monos, 0, count - 1);
-  Poly sum;
-  sum.arr = SafeMalloc(count);
-  size_t imonos = 1, isum = 0;
-  Mono last = MonoClone(&(monos[0]));
-  while(imonos < count){
-    if(last.exp == monos[imonos].exp){
-      Poly temp = PolyAdd(&(last.p), &(monos[imonos].p));
-      PolyDestroy(&(last.p));
-      last.p = temp;
-    }else{
-      if(!PolyIsZero(&(last.p))){
-        (sum.arr)[isum] = last;
-        isum++;
-      }
-      last = MonoClone(&(monos[imonos]));
-    }
-    imonos++;
-  }
-  sum = AddLast(isum, count, last, &sum);
-  sum = UnproperPoly(&sum);
-  return sum;
-}
-
-/*
-
-Poly MonoAtPoly(Mono *m, Poly *q){
-  Poly result = PolyClone(q);
-  // m->p * q ^ exp
-  for(int i = 0; i < m->exp; i++){ //szybkie potegownie zamiast tego
-    Poly old_result = result;
-    result = PolyMul(&result, q);
-    PolyDestroy(&old_result);
-  }
-  Poly old_result = result;
-  result = PolyMul(&result, &(m->p));
-  PolyDestroy(&old_result);
-  return result;
-}
-
-Poly PolyAtPoly(Poly *p, Poly *q){
-  if(!p->arr) return PolyClone(p); //sth here
-  Poly result = PolyZero();
-  for(size_t i = 0; i < p->size; i++){
-    Poly old_result = result;
-    Poly next = MonoAtPoly(&(p->arr)[i], q);
-    result = PolyAdd(&result, &next);
-    PolyDestroy(&old_result);
-    PolyDestroy(&next);
-  }
-  return result;
-}
-
-Poly PolyCompose(const Poly *p, size_t k, const Poly q[]){
-  poly_exp_t deg = PolyDeg(p);
-  poly_exp_t i = 0;
-  Poly result = PolyClone(p);
-  while(i < min(deg, k)){
-    Poly old_result = result;
-    result = PolyAtPoly(&result, &(q[i]));
-    PolyDestroy(&old_result);
-    i++;
-  }
-  Poly zero = PolyZero();
-  while(i < deg){
-    Poly old_result = result;
-    result = PolyAtPoly(&result, &zero);
-    PolyDestroy(&old_result);
-    i++;
-  }
-  
-}*/
-
-
-
-void PrintPoly2(Poly *poly);
-
-void MonoPrint2(Mono *mono) {
-  printf("(");
-  PrintPoly2(&(mono->p));
-  printf(",");
-  printf("%d", mono->exp);
-  printf(")");
-}
-
-/**
- * wypisuje na standardowe wyjście wielomian z wierzchołka stosu
- */
-void PrintPoly2(Poly *poly) {
-  if(!poly->arr)
-    printf("%ld", poly->coeff);
-  else {
-    //printf("(");
-    for(size_t i = 0; i < poly->size - 1; i++) {
-      MonoPrint2(&((poly->arr)[i]));
-      printf("+");
-    }
-    MonoPrint2(&((poly->arr)[poly->size - 1]));
-    //printf(")");
-  }
-}
-
-
-
-Poly PolyPow(const Poly *p, poly_exp_t exp){ //szybkie potegownie poly
+Poly PolyPow(const Poly *p, poly_exp_t exp){
   if(exp == 0) return PolyFromCoeff(1);
   if(exp == 1) return PolyClone(p);
   Poly res = PolyPow(p, exp / 2);
@@ -528,16 +341,10 @@ Poly PolyCompose(const Poly *p, size_t k, const Poly q[]){
   if(!p->arr) return PolyClone(p);
   Poly result = PolyZero();
   for(size_t i = 0; i < p->size; i++){
-    //printf("  in PolyCompose i = %ld\n", i);
-    Poly q_pow;
-    Poly p_composed;
+    Poly q_pow, p_composed;
     if(k > 0){
-      //printf("  q    = "); PrintPoly2((q)); printf("\n");
-      //printf("  exp  = %d\n", p->arr[i].exp);
       q_pow = PolyPow(q, p->arr[i].exp);
-      //printf("  q_pow = "); PrintPoly2(&(q_pow)); printf("\n");
       p_composed = PolyCompose(&((p->arr)[i]).p, k - 1, &q[1]);
-      //printf("  p_com = "); PrintPoly2(&(p_composed)); printf("\n");
     }else{
       if(p->arr[i].exp == 0) q_pow = PolyFromCoeff(1);
       else q_pow = PolyZero();
