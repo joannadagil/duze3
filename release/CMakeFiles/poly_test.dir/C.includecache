@@ -1,0 +1,30 @@
+#IncludeRegexLine: ^[ 	]*[#%][ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+/home/asia/ipp/duze2/klon/src/poly.c
+assert.h
+-
+stdbool.h
+-
+stddef.h
+-
+stdlib.h
+-
+stdio.h
+-
+poly.h
+/home/asia/ipp/duze2/klon/src/poly.h
+
+/home/asia/ipp/duze2/klon/src/poly.h
+assert.h
+-
+stdbool.h
+-
+stddef.h
+-
+
