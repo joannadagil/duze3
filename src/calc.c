@@ -153,8 +153,9 @@ Poly ProcessProperPoly(char **line, bool *valid, char* last) {
       size *= 2;
       monos = realloc(monos, size * sizeof(Mono));
     }
-    (*line)++; i++;
+    (*line)++;
     monos[i] = ProcessMono(line, valid, last); // (mono)
+    i++;
   }
   if(**line == 0 && *line != last - 1) *valid = false;
   if(!(**line == ',' || **line == '\n' || **line == 0)) *valid = false;
