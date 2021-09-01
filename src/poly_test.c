@@ -3662,6 +3662,7 @@ static bool AddTest2(void) {
   size_t first_poly_len = 2;
   size_t second_poly_len;
   while (first_poly_len <= conf_size && good) {
+    printf("step %lu\n", first_poly_len);
     for (size_t i = prev_poly_len; i < first_poly_len; ++i)
       pol_arr_expected_res[i] += coef_arr1[i];
     prev_poly_len = first_poly_len;
