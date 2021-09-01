@@ -276,10 +276,10 @@ bool PolyIsEq(const Poly *p, const Poly *q){
   return false;
 }
 
-poly_coeff_t pow(poly_coeff_t x, poly_exp_t exp){
+poly_coeff_t power(poly_coeff_t x, poly_exp_t exp){
   if(exp == 0) return 1;
   if(exp == 1) return x;
-  poly_coeff_t res = pow(x, exp / 2);
+  poly_coeff_t res = power(x, exp / 2);
   if(exp % 2 == 1)
     return res * res * x;
   return res * res;
@@ -289,7 +289,7 @@ Poly PolyAt(const Poly *p, poly_coeff_t x){
   if(p->arr == NULL) return PolyClone(p);
   Poly res = PolyZero();
   for(size_t i = 0; i < p->size; i++){
-    Poly temp0 = PolyFromCoeff(pow(x, p->arr[i].exp));
+    Poly temp0 = PolyFromCoeff(power(x, p->arr[i].exp));
     Poly temp1 = PolyMul(&(p->arr[i].p), &temp0);
     Poly temp2 = PolyAdd(&res, &temp1);
     PolyDestroy(&res);
