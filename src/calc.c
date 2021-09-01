@@ -300,7 +300,7 @@ void DEG(bool *flow) {
 }
 
 /**
- * Wylicza wartość wielomianu w punkcie @p x, usuwa wielomian z wierzchołka 
+ * Wylicza wartość wielomianu w wczytanym punkcie, usuwa wielomian z wierzchołka 
  * i wstawia na stos wynik operacji.
  * @param[in] line : linia wejściowa z poleceniem
  * @param[in] no : numer linii
@@ -344,7 +344,7 @@ void AT(char *line, long int no, char *last) {
 
 /**
  * Wypisuje na standardowe wyjście stopień wielomianu ze względu na zmienną 
- * o numerze @p idx (−1 dla wielomianu tożsamościowo równego zeru)
+ * o wczytanym numerze (−1 dla wielomianu tożsamościowo równego zeru)
  * @param[in] line : linia wejściowa z poleceniem
  * @param[in] no : numer linii
  * @param[in] last : wskaźnik wskaźnik na null po ostatnim elemencie wczytanej linii
@@ -460,8 +460,7 @@ void COMPOSE(char *line, long int no, char* last) {
   }
   Poly new = PolyCompose(&(stack->poly), k, q);
   bool flow; // blank bc we already checked that
-  for(size_t i = 0; i <= k; i++)
-    POP(&flow);
+  for(size_t i = 0; i <= k; i++) POP(&flow);
   free(q);
   PolyPush(new);
 }
@@ -573,7 +572,7 @@ int main() {
   while((read = getline(&line, &size, stdin)) != -1) {
     if(errno  == ENOMEM) exit(1);
     save_line = line;
-    last = line + read;// - 1;
+    last = line + read;
     ProcessLine(&save_line, no, last);
     no++;
   }

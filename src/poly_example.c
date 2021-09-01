@@ -8,8 +8,6 @@
 #include <stdarg.h>
 #include <stdlib.h>
 
-#include <stdio.h>  //heeeeeeeere
-
 #define CHECK_PTR(p)  \
   do {                \
     if (p == NULL) {  \
@@ -322,5 +320,4 @@ int main() {
   assert(SimpleIsEqTest());
   assert(SimpleAtTest());
   assert(OverflowTest());
-  printf("i lived!\n");
 }
